@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Remot Papan Skor Wasit</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: sans-serif; background-color: #121212; color: #fff; margin: 0; padding: 12px; }
+
+    /* --- MINI SCOREBOARD UNTUK MONITOR WASIT --- */
+    .mini-scoreboard {
+      background-color: #080808;
+      border: 2px solid #333;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 20px;
+      display: grid;
+      grid-template-columns: 2fr 1fr 2fr;
+      align-items: center;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+      position: sticky;
+      top: 0;
+      z-index: 99;
+    }
+    .mini-team { display: flex; flex-direction: column; }
+    .mini-team-name { font-size: 0.9rem; font-weight: bold; color: #ff3333; text-transform: uppercase; line-height: 1.1; height: 2.2em; overflow: hidden; }
+    .mini-score { font-family: 'Orbitron', monospace; font-size: 3rem; font-weight: 900; line-height: 1; margin-top: 5px; }
+    .mini-score-a { color: #00e5ff; }
+    .mini-score-b { color: #00ff66; }
+    
+    .mini-center { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .mini-set-label { font-size: 0.75rem; color: #aaa; font-weight: bold; }
+    .mini-set-val { font-family: 'Orbitron', monospace; font-size: 1.8rem; color: #ffcc00; font-weight: 900; }
+    .mini-wins { display: flex; gap: 8px; font-size: 0.8rem; font-weight: bold; color: #ffcc00; margin-top: 2px; }
+
+    /* --- FORM & BUTTONS CONTROLLER --- */
+    .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .card { background: #1e1e1e; border-radius: 12px; padding: 12px; border: 1px solid #333; }
+    .card-full { grid-column: span 2; }
+    .card-title { font-size: 1rem; font-weight: bold; margin-bottom: 8px; text-align: center; border-bottom: 1px solid #333; padding-bottom: 4px; }
+    .team-a-title { color: #00e5ff; }
+    .team-b-title { color: #00ff66; }
+    .set-title { color: #ffcc00; }
+    
+    textarea { width: 100%; background: #2b2b2b; border: 1px solid #444; color: #fff; padding: 8px; border-radius: 6px; font-size: 0.9rem; text-align: center; height: 50px; resize: none; font-weight: bold; }
+    .btn-group { display: flex; gap: 8px; justify-content: center; }
+    button { flex: 1; padding: 14px 5px; font-size: 1.2rem; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; touch-action: manipulation; }
+    button:active { transform: scale(0.95); }
+    .btn-add { background-color: #28a745; color: white; }
+    .btn-sub { background-color: #dc3545; color: white; }
+    .btn-main { background-color: #ffc107; color: black; font-weight: bold; width: 100%; padding: 10px; margin-top: 5px;}
+    .btn-reset { background-color: #6c757d; color: white; width: 100%; margin-top: 15px; padding: 12px; }
+    .label-sm { font-size: 0.8rem; color: #aaa; text-align: center; margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+
+  <!-- 📺 SCOREBOARD MINI UNTUK PANTAUAN WASIT -->
+  <div class="mini-scoreboard">
+    <div class="mini-team">
+      <div id="disp-name-a" class="mini-team-name">TIM A</div>
+      <div id="disp-score-a" class="mini-score mini-score-a">00</div>
+    </div>
+
+    <div class="mini-center">
+      <div class="mini-set-label">SET</div>
+      <div id="disp-set" class="mini-set-val">1</div>
+      <div class="mini-wins">
+        <span>W:<span id="disp-win-a">0</span></span>
+        <span>|</span>
+        <span>W:<span id="disp-win-b">0</span></span>
+      </div>
+    </div>
+
+    <div class="mini-team">
+      <div id="disp-name-b" class="mini-team-name">TIM B</div>
+      <div id="disp-score-b" class="mini-score mini-score-b">00</div>
+    </div>
+  </div>
+
+  <!-- 🎮 TOMBOL KONTROL WASIT -->
+  <div class="card card-full">
+    <div class="card-title">Ganti Nama Tim</div>
+    <div style="display: flex; gap: 8px;">
+      <textarea id="inputTeamA" placeholder="Nama Tim A">GRUNDA&#10;PUTRA</textarea>
+      <textarea id="inputTeamB" placeholder="Nama Tim B">BNI46&#10;JKT</textarea>
+    </div>
+    <button class="btn-main" onclick="saveNames()">Update Nama Tim</button>
+  </div>
+
+  <div class="grid-container" style="margin-top: 12px;">
+    <!-- TIM A -->
+    <div class="card">
+      <div class="card-title team-a-title">SKOR A</div>
+      <div class="btn-group">
+        <button class="btn-add" onclick="updateScore('teamA', 1)">+1</button>
+        <button class="btn-sub" onclick="updateScore('teamA', -1)">-1</button>
+      </div>
+      <div style="margin-top: 10px;">
+        <div class="label-sm">WIN A</div>
+        <div class="btn-group">
+          <button class="btn-add" style="padding:6px" onclick="updateWin('teamA', 1)">+1</button>
+          <button class="btn-sub" style="padding:6px" onclick="updateWin('teamA', -1)">-1</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TIM B -->
+    <div class="card">
+      <div class="card-title team-b-title">SKOR B</div>
+      <div class="btn-group">
+        <button class="btn-add" onclick="updateScore('teamB', 1)">+1</button>
+        <button class="btn-sub" onclick="updateScore('teamB', -1)">-1</button>
+      </div>
+      <div style="margin-top: 10px;">
+        <div class="label-sm">WIN B</div>
+        <div class="btn-group">
+          <button class="btn-add" style="padding:6px" onclick="updateWin('teamB', 1)">+1</button>
+          <button class="btn-sub" style="padding:6px" onclick="updateWin('teamB', -1)">-1</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SET -->
+    <div class="card card-full">
+      <div class="card-title set-title">KONTROL SET</div>
+      <div class="btn-group">
+        <button class="btn-add" style="background:#ffc107; color:#000" onclick="updateSet(1)">+ SET</button>
+        <button class="btn-sub" style="background:#e0a800; color:#000" onclick="updateSet(-1)">- SET</button>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-reset" onclick="resetAll()">🔄 Reset Semua Skor & Set</button>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, runTransaction, update, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB_5DbpY5XqNMXPTBljXK0gm4zyH-wkAiI",
+      authDomain: "papanscore.firebaseapp.com",
+      databaseURL: "https://papanscore-default-rtdb.firebaseio.com",
+      projectId: "papanscore",
+      storageBucket: "papanscore.firebasestorage.app",
+      messagingSenderId: "449160493063",
+      appId: "1:449160493063:web:364dedee3634cf9a18d2a2"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // DENGARKAN DATA UNTUK SCOREBOARD MINI WASIT
+    onValue(ref(db, 'scoreboard'), (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        document.getElementById('disp-score-a').innerText = String(data.teamA_score || 0).padStart(2, '0');
+        document.getElementById('disp-score-b').innerText = String(data.teamB_score || 0).padStart(2, '0');
+        document.getElementById('disp-set').innerText = data.set_value || 1;
+        document.getElementById('disp-win-a').innerText = data.teamA_wins || 0;
+        document.getElementById('disp-win-b').innerText = data.teamB_wins || 0;
+        if(data.teamA_name) document.getElementById('disp-name-a').innerHTML = data.teamA_name;
+        if(data.teamB_name) document.getElementById('disp-name-b').innerHTML = data.teamB_name;
+      }
+    });
+
+    window.updateScore = function(team, amount) {
+      runTransaction(ref(db, `scoreboard/${team}_score`), (curr) => {
+        let val = (curr || 0) + amount;
+        return val < 0 ? 0 : val;
+      });
+    };
+
+    window.updateWin = function(team, amount) {
+      runTransaction(ref(db, `scoreboard/${team}_wins`), (curr) => {
+        let val = (curr || 0) + amount;
+        return val < 0 ? 0 : val;
+      });
+    };
+
+    window.updateSet = function(amount) {
+      runTransaction(ref(db, `scoreboard/set_value`), (curr) => {
+        let val = (curr || 1) + amount;
+        return val < 1 ? 1 : val;
+      });
+    };
+
+    window.saveNames = function() {
+      const nameA = document.getElementById('inputTeamA').value.replace(/\n/g, '<br>');
+      const nameB = document.getElementById('inputTeamB').value.replace(/\n/g, '<br>');
+      update(ref(db, 'scoreboard'), { teamA_name: nameA, teamB_name: nameB });
+      alert('Nama Tim Diperbarui!');
+    };
+
+    window.resetAll = function() {
+      if(confirm("Reset semua skor dan set ke 0?")) {
+        update(ref(db, 'scoreboard'), {
+          teamA_score: 0, teamB_score: 0,
+          teamA_wins: 0, teamB_wins: 0, set_value: 1
+        });
+      }
+    };
+  </script>
+</body>
+</html>
