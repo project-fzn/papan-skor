@@ -196,7 +196,6 @@
       const nameA = document.getElementById('inputTeamA').value.replace(/\n/g, '<br>');
       const nameB = document.getElementById('inputTeamB').value.replace(/\n/g, '<br>');
       update(ref(db, 'scoreboard'), { teamA_name: nameA, teamB_name: nameB });
-      alert('Nama Tim Diperbarui!');
     };
 
     window.resetAll = function() {
