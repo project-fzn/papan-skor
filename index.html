@@ -3,16 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Papan Skor Digital LED</title>
+  <title>Papan Skor Digital Modern LED</title>
+  
+  <!-- Font Digital Modern (Orbitron) & Font Nama Tim (Chakra Petch) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
 
   <style>
     body {
       background-color: #000;
       color: white;
-      font-family: 'VT323', monospace;
+      font-family: 'Chakra Petch', sans-serif;
       margin: 0;
       overflow: hidden;
       height: 100vh;
@@ -23,88 +25,111 @@
     }
 
     .led-board {
-      width: 95vw;
-      height: 53.43vw;
-      border: 8px solid #333;
+      width: 96vw;
+      height: 54vw; /* Aspek Rasio 16:9 TV */
+      border: 8px solid #222;
+      border-radius: 12px;
       background-color: #050505;
-      padding: 2vw;
+      padding: 2.5vw;
       box-sizing: border-box;
       display: grid;
       grid-template-columns: 2.5fr 1fr 2.5fr;
-      grid-template-rows: 1fr auto;
-      gap: 1vw;
+      grid-template-rows: auto 1fr;
+      gap: 1.5vw;
       position: relative;
+      box-shadow: 0 0 50px rgba(0,0,0,0.9);
     }
 
-    .led-text {
-      position: relative;
-      background-image: 
-        linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
-      background-size: 3px 3px;
+    /* Font Digital Modern Orbitron untuk Angka */
+    .digital-font {
+      font-family: 'Orbitron', monospace;
+      font-weight: 900;
     }
 
-    .led-red { color: #ff3333; text-shadow: 0 0 15px #ff3333, 0 0 5px #ff0000; }
-    .led-yellow { color: #ffcc00; text-shadow: 0 0 15px #ffcc00, 0 0 5px #ff9900; }
-    .led-blue { color: #33ccff; text-shadow: 0 0 15px #33ccff, 0 0 5px #0099ff; }
-    .led-green { color: #33ff33; text-shadow: 0 0 15px #33ff33, 0 0 5px #00ff00; }
+    /* Efek Glow LED Spesifik */
+    .led-red { color: #ff2a2a; text-shadow: 0 0 20px rgba(255,42,42,0.8), 0 0 5px #ff0000; }
+    .led-yellow { color: #ffcc00; text-shadow: 0 0 20px rgba(255,204,0,0.8), 0 0 5px #ffaa00; }
+    .led-blue { color: #00e5ff; text-shadow: 0 0 25px rgba(0,229,255,0.8), 0 0 8px #00aaff; }
+    .led-green { color: #00ff66; text-shadow: 0 0 25px rgba(0,255,102,0.8), 0 0 8px #00cc44; }
     .led-white { color: #ffffff; text-shadow: 0 0 10px #ffffff; }
 
-    .team-info { line-height: 1.1; display: flex; flex-direction: column; justify-content: space-between; }
-    .team-name { font-size: 5.5vw; }
+    /* Nama Tim diperbesar & menggunakan font Chakra Petch */
+    .team-info { line-height: 1.05; display: flex; flex-direction: column; justify-content: center; }
+    .team-name { 
+      font-size: 7.5vw; /* UKURAN FONT TIM DIPERBESAR */
+      font-weight: 700;
+      letter-spacing: 2px;
+      word-break: break-word;
+    }
 
-    .middle-stats { grid-column: 2; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; margin-top: -2vw; }
-    .set-container { display: flex; align-items: center; font-size: 3vw; margin-bottom: 0.5vw; }
-    .set-label { margin: 0 1vw; }
-    .set-value { font-size: 8vw; color: #ffcc00; }
+    /* Bagian Tengah (Set & Wins) */
+    .middle-stats { grid-column: 2; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; }
+    .set-container { display: flex; align-items: center; font-size: 2.5vw; font-weight: bold; margin-bottom: 0.2vw; }
+    .set-label { margin: 0 0.8vw; letter-spacing: 2px; }
+    .set-value { font-size: 7vw; line-height: 1; }
 
-    .wins-container { display: flex; justify-content: space-between; width: 100%; align-items: center; margin-top: -1vw; }
+    .wins-container { display: flex; justify-content: space-between; width: 100%; align-items: center; margin-top: 0.5vw; }
     .win-item { display: flex; flex-direction: column; align-items: center; }
-    .win-value { font-size: 6vw; }
-    .win-label { font-size: 2vw; color: #ffffff; line-height: 1; }
+    .win-value { font-size: 5.5vw; line-height: 1; }
+    .win-label { font-size: 1.8vw; color: #ffffff; font-weight: bold; letter-spacing: 1px; }
 
-    .score-container { grid-row: 2; font-size: 22vw; line-height: 1; text-align: center; }
+    /* Ukuran Skor Raksasa */
+    .score-container { 
+      grid-row: 2; 
+      font-size: 21vw; 
+      line-height: 0.85; 
+      text-align: center; 
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
     .score-team-a { grid-column: 1; }
     .score-team-b { grid-column: 3; }
 
-    .footer-label { position: absolute; bottom: 2vw; font-size: 4vw; color: #ffffff; }
-    .label-l { left: 4vw; }
-    .label-r { right: 4vw; }
+    /* Label Footer L / R */
+    .footer-label { position: absolute; bottom: 1.5vw; font-size: 3.5vw; font-weight: bold; }
+    .label-l { left: 3vw; } 
+    .label-r { right: 3vw; }
   </style>
 </head>
 <body>
 
   <div class="led-board">
-    <div class="team-info score-team-a led-text">
+    <!-- TIM A (KIRI) -->
+    <div class="team-info score-team-a">
       <div class="team-name led-red">GRUNDA<br>PUTRA</div>
     </div>
-    <div class="team-info score-team-b led-text">
+
+    <!-- TIM B (KANAN) -->
+    <div class="team-info score-team-b">
       <div class="team-name led-red">BNI46<br>JKT</div>
     </div>
 
-    <div class="middle-stats led-text">
+    <!-- STATS TENGAH -->
+    <div class="middle-stats">
       <div class="set-container led-white">
         <span>&lt;</span><span class="set-label">SET</span><span>&gt;</span>
       </div>
-      <div id="set-value" class="set-value led-yellow">1</div>
+      <div id="set-value" class="set-value digital-font led-yellow">1</div>
       
       <div class="wins-container">
         <div class="win-item">
-          <div id="win-a" class="win-value led-yellow">0</div>
+          <div id="win-a" class="win-value digital-font led-yellow">0</div>
           <div class="win-label">WIN</div>
         </div>
         <div class="win-item">
-          <div id="win-b" class="win-value led-yellow">0</div>
+          <div id="win-b" class="win-value digital-font led-yellow">0</div>
           <div class="win-label">WIN</div>
         </div>
       </div>
     </div>
 
-    <div id="score-a" class="score-container score-team-a led-blue led-text">00</div>
-    <div id="score-b" class="score-container score-team-b led-green led-text">00</div>
+    <!-- SKOR UTAMA -->
+    <div id="score-a" class="score-container score-team-a digital-font led-blue">00</div>
+    <div id="score-b" class="score-container score-team-b digital-font led-green">00</div>
 
-    <div class="footer-label label-l led-white led-text">L</div>
-    <div class="footer-label label-r led-white led-text">R</div>
+    <div class="footer-label label-l led-white">L</div>
+    <div class="footer-label label-r led-white">R</div>
   </div>
 
   <script type="module">
