@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Remot Papan Skor</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: sans-serif; background-color: #121212; color: #fff; margin: 0; padding: 15px; }
+    h2 { text-align: center; color: #ffcc00; margin-bottom: 20px; }
+    .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .card { background: #1e1e1e; border-radius: 12px; padding: 15px; border: 1px solid #333; }
+    .card-full { grid-column: span 2; }
+    .card-title { font-size: 1.1rem; font-weight: bold; margin-bottom: 10px; text-align: center; border-bottom: 2px solid #333; padding-bottom: 5px; }
+    .team-a-title { color: #33ccff; }
+    .team-b-title { color: #33ff33; }
+    .set-title { color: #ffcc00; }
+    textarea { width: 100%; background: #2b2b2b; border: 1px solid #444; color: #fff; padding: 10px; border-radius: 6px; font-size: 1rem; text-align: center; height: 60px; resize: none; font-weight: bold; }
+    .btn-group { display: flex; gap: 10px; justify-content: center; }
+    button { flex: 1; padding: 15px 5px; font-size: 1.2rem; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; touch-action: manipulation; }
+    button:active { transform: scale(0.96); }
+    .btn-add { background-color: #28a745; color: white; }
+    .btn-sub { background-color: #dc3545; color: white; }
+    .btn-main { background-color: #ffc107; color: black; font-weight: bold; width: 100%; padding: 12px; margin-top: 5px;}
+    .btn-reset { background-color: #6c757d; color: white; width: 100%; margin-top: 20px; }
+    .label-sm { font-size: 0.85rem; color: #aaa; text-align: center; margin-bottom: 5px; }
+  </style>
+</head>
+<body>
+
+  <h2>🎮 Remot Papan Skor</h2>
+
+  <div class="card card-full">
+    <div class="card-title">Ganti Nama Tim (Enter untuk 2 Baris)</div>
+    <div style="display: flex; gap: 10px;">
+      <textarea id="inputTeamA" placeholder="Nama Tim A">GRUNDA&#10;PUTRA</textarea>
+      <textarea id="inputTeamB" placeholder="Nama Tim B">BNI46&#10;JKT</textarea>
+    </div>
+    <button class="btn-main" onclick="saveNames()">Update Nama Tim</button>
+  </div>
+
+  <div class="grid-container" style="margin-top: 15px;">
+    <!-- TIM A -->
+    <div class="card">
+      <div class="card-title team-a-title">SKOR A</div>
+      <div class="btn-group">
+        <button class="btn-add" onclick="updateScore('teamA', 1)">+1</button>
+        <button class="btn-sub" onclick="updateScore('teamA', -1)">-1</button>
+      </div>
+      <div style="margin-top: 15px;">
+        <div class="label-sm">WIN A</div>
+        <div class="btn-group">
+          <button class="btn-add" style="padding:8px" onclick="updateWin('teamA', 1)">+1</button>
+          <button class="btn-sub" style="padding:8px" onclick="updateWin('teamA', -1)">-1</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TIM B -->
+    <div class="card">
+      <div class="card-title team-b-title">SKOR B</div>
+      <div class="btn-group">
+        <button class="btn-add" onclick="updateScore('teamB', 1)">+1</button>
+        <button class="btn-sub" onclick="updateScore('teamB', -1)">-1</button>
+      </div>
+      <div style="margin-top: 15px;">
+        <div class="label-sm">WIN B</div>
+        <div class="btn-group">
+          <button class="btn-add" style="padding:8px" onclick="updateWin('teamB', 1)">+1</button>
+          <button class="btn-sub" style="padding:8px" onclick="updateWin('teamB', -1)">-1</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SET -->
+    <div class="card card-full">
+      <div class="card-title set-title">KONTROL SET</div>
+      <div class="btn-group">
+        <button class="btn-add" style="background:#ffc107; color:#000" onclick="updateSet(1)">+ SET</button>
+        <button class="btn-sub" style="background:#e0a800; color:#000" onclick="updateSet(-1)">- SET</button>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-reset" onclick="resetAll()">🔄 Reset Semua Skor & Set</button>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, runTransaction, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB_5DbpY5XqNMXPTBljXK0gm4zyH-wkAiI",
+      authDomain: "papanscore.firebaseapp.com",
+      databaseURL: "https://papanscore-default-rtdb.firebaseio.com",
+      projectId: "papanscore",
+      storageBucket: "papanscore.firebasestorage.app",
+      messagingSenderId: "449160493063",
+      appId: "1:449160493063:web:364dedee3634cf9a18d2a2"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    window.updateScore = function(team, amount) {
+      runTransaction(ref(db, `scoreboard/${team}_score`), (curr) => {
+        let val = (curr || 0) + amount;
+        return val < 0 ? 0 : val;
+      });
+    };
+
+    window.updateWin = function(team, amount) {
+      runTransaction(ref(db, `scoreboard/${team}_wins`), (curr) => {
+        let val = (curr || 0) + amount;
+        return val < 0 ? 0 : val;
+      });
+    };
+
+    window.updateSet = function(amount) {
+      runTransaction(ref(db, `scoreboard/set_value`), (curr) => {
+        let val = (curr || 1) + amount;
+        return val < 1 ? 1 : val;
+      });
+    };
+
+    window.saveNames = function() {
+      const nameA = document.getElementById('inputTeamA').value.replace(/\n/g, '<br>');
+      const nameB = document.getElementById('inputTeamB').value.replace(/\n/g, '<br>');
+      update(ref(db, 'scoreboard'), { teamA_name: nameA, teamB_name: nameB });
+      alert('Nama Tim Diperbarui!');
+    };
+
+    window.resetAll = function() {
+      if(confirm("Reset semua skor dan set ke 0?")) {
+        update(ref(db, 'scoreboard'), {
+          teamA_score: 0, teamB_score: 0,
+          teamA_wins: 0, teamB_wins: 0, set_value: 1
+        });
+      }
+    };
+  </script>
+</body>
+</html>
