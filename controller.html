@@ -13,6 +13,39 @@
     * { box-sizing: border-box; }
     body { font-family: sans-serif; background-color: #121212; color: #fff; margin: 0; padding: 12px; }
 
+    /* POPUP INPUT PIN */
+    .pin-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.95);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+    .pin-box {
+      background: #1e1e1e;
+      padding: 25px;
+      border-radius: 12px;
+      border: 2px solid #ffc107;
+      text-align: center;
+      width: 85%;
+      max-width: 320px;
+    }
+    .pin-input {
+      width: 100%;
+      padding: 12px;
+      font-size: 1.5rem;
+      text-align: center;
+      letter-spacing: 5px;
+      margin: 15px 0;
+      border-radius: 8px;
+      border: 1px solid #444;
+      background: #2b2b2b;
+      color: #ffc107;
+      font-weight: bold;
+    }
+
     .mini-scoreboard {
       background-color: #080808;
       border: 2px solid #333;
@@ -28,14 +61,14 @@
       top: 0;
       z-index: 99;
     }
-    .mini-team { display: flex; flex-direction: column; }
-    .mini-team-name { font-size: 0.9rem; font-weight: bold; color: #ff3333; text-transform: uppercase; line-height: 1.1; height: 2.2em; overflow: hidden; }
-    .mini-score { font-family: 'Orbitron', monospace; font-size: 3rem; font-weight: 900; line-height: 1; margin-top: 5px; }
+    .mini-team { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .mini-team-name { font-size: 0.9rem; font-weight: bold; color: #ff3333; text-transform: uppercase; line-height: 1.1; height: 2.2em; overflow: hidden; text-align: center; width: 100%; }
+    .mini-score { font-family: 'Orbitron', monospace; font-size: 3rem; font-weight: 900; line-height: 1; margin-top: 5px; text-align: center; }
     .mini-score-a { color: #00e5ff; }
     .mini-score-b { color: #00ff66; }
     
     .mini-center { display: flex; flex-direction: column; align-items: center; justify-content: center; }
-    .mini-league { font-size: 0.75rem; color: #ffcc00; font-weight: bold; text-transform: uppercase; margin-bottom: 2px; line-height: 1.1; }
+    .mini-league { font-size: 0.75rem; color: #ffcc00; font-weight: bold; text-transform: uppercase; margin-bottom: 2px; line-height: 1.1; text-align: center; }
     .mini-set-label { font-size: 0.65rem; color: #aaa; font-weight: bold; }
     .mini-set-val { font-family: 'Orbitron', monospace; font-size: 1.5rem; color: #ffcc00; font-weight: 900; line-height: 1; }
     .mini-wins { display: flex; gap: 8px; font-size: 0.75rem; font-weight: bold; color: #ffcc00; margin-top: 2px; }
@@ -64,27 +97,38 @@
 </head>
 <body>
 
+  <!-- LAYER MASUKKAN PIN -->
+  <div id="pinOverlay" class="pin-overlay">
+    <div class="pin-box">
+      <h3 style="margin:0; color:#ffc107;">🔒 KEAMANAN REMOT</h3>
+      <p style="font-size:0.85rem; color:#ccc; margin-top:5px;">Masukkan PIN 4 Digit Wasit:</p>
+      <input type="password" id="inputPin" class="pin-input" maxlength="4" placeholder="••••">
+      <button class="btn-main" onclick="verifyPin()">MASUK REMOT</button>
+      <p id="pinError" style="color:#ff3333; font-size:0.8rem; margin-top:10px; display:none;">PIN Salah! Silakan coba lagi.</p>
+    </div>
+  </div>
+
   <!-- SCOREBOARD MINI WASIT -->
   <div class="mini-scoreboard">
     <div class="mini-team">
-      <div id="disp-name-a" class="mini-team-name">TIM A</div>
-      <div id="disp-score-a" class="mini-score mini-score-a">00</div>
+      <div id="disp-name-a" class="mini-team-name">&nbsp;</div>
+      <div id="disp-score-a" class="mini-score mini-score-a">--</div>
     </div>
 
     <div class="mini-center">
-      <div id="disp-league" class="mini-league">LIGA 1</div>
+      <div id="disp-league" class="mini-league">&nbsp;</div>
       <div class="mini-set-label">SET</div>
-      <div id="disp-set" class="mini-set-val">1</div>
+      <div id="disp-set" class="mini-set-val">-</div>
       <div class="mini-wins">
-        <span>W:<span id="disp-win-a">0</span></span>
+        <span>W:<span id="disp-win-a">-</span></span>
         <span>|</span>
-        <span>W:<span id="disp-win-b">0</span></span>
+        <span>W:<span id="disp-win-b">-</span></span>
       </div>
     </div>
 
     <div class="mini-team">
-      <div id="disp-name-b" class="mini-team-name">TIM B</div>
-      <div id="disp-score-b" class="mini-score mini-score-b">00</div>
+      <div id="disp-name-b" class="mini-team-name">&nbsp;</div>
+      <div id="disp-score-b" class="mini-score mini-score-b">--</div>
     </div>
   </div>
 
@@ -94,7 +138,6 @@
     
     <div style="margin-bottom: 8px;">
       <div class="label-sm">NAMA LIGA / TURNAMEN (Enter untuk 2 baris)</div>
-      <!-- Menggunakan Textarea Agar Bisa Enter / Multi Line -->
       <textarea id="inputLeague" class="league-area" placeholder="Nama Liga">TURNAMEN VOLI&#10;EGA CUP 2026</textarea>
     </div>
 
@@ -170,6 +213,24 @@
 
     const urlParams = new URLSearchParams(window.location.search);
     const roomId = urlParams.get('room') || 'demo';
+    
+    // 🔑 PIN DEFAULT (Anda bisa ubah PIN ini misal: '1234')
+    const DEFAULT_PIN = "2305"; 
+
+    // VERIFIKASI PIN DARI SESSION STORAGE (AGAR HP REDUP TIDAK MINTA RE-ENTER)
+    if (sessionStorage.getItem(`pin_auth_${roomId}`) === "true") {
+      document.getElementById('pinOverlay').style.display = 'none';
+    }
+
+    window.verifyPin = function() {
+      const input = document.getElementById('inputPin').value;
+      if (input === DEFAULT_PIN) {
+        sessionStorage.setItem(`pin_auth_${roomId}`, "true");
+        document.getElementById('pinOverlay').style.display = 'none';
+      } else {
+        document.getElementById('pinError').style.display = 'block';
+      }
+    };
 
     const formatScore = (val) => {
       if (val === undefined || val === null) return '00';
@@ -213,7 +274,6 @@
       });
     };
 
-    // Konversi baris baru (Enter) ke tag <br>
     window.saveMatchInfo = function() {
       const league = document.getElementById('inputLeague').value.replace(/\n/g, '<br>');
       const nameA = document.getElementById('inputTeamA').value.replace(/\n/g, '<br>');
