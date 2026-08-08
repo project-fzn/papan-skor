@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Papan Skor Digital Modern LED</title>
   
-  <!-- Font Digital Modern (Orbitron) & Font Nama Tim (Chakra Petch) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
@@ -30,12 +29,12 @@
       border: 8px solid #222;
       border-radius: 12px;
       background-color: #050505;
-      padding: 2.5vw;
+      padding: 2vw;
       box-sizing: border-box;
       display: grid;
-      grid-template-columns: 2.5fr 1fr 2.5fr;
+      grid-template-columns: 2.5fr 1.2fr 2.5fr; /* Lebar kolom tengah sedikit diperluas */
       grid-template-rows: auto 1fr;
-      gap: 1.5vw;
+      gap: 1vw;
       position: relative;
       box-shadow: 0 0 50px rgba(0,0,0,0.9);
     }
@@ -46,32 +45,49 @@
     }
 
     /* Warna LED */
-    .led-red { color: #e61e04; text-shadow: 0 0 20px rgba(255,42,42,0.8), 0 0 5px #eb1313; }
-    .led-oren { color: #01013e; text-shadow: 0 0 2px rgba(243, 243, 244, 0.783), 0 0 5px #01013e; }
+    .led-red { color: #ff2a2a; text-shadow: 0 0 20px rgba(255,42,42,0.8), 0 0 5px #ff0000; }
     .led-yellow { color: #ffcc00; text-shadow: 0 0 20px rgba(255,204,0,0.8), 0 0 5px #ffaa00; }
     .led-blue { color: #00e5ff; text-shadow: 0 0 25px rgba(0,229,255,0.8), 0 0 8px #00aaff; }
     .led-green { color: #00ff66; text-shadow: 0 0 25px rgba(0,255,102,0.8), 0 0 8px #00cc44; }
     .led-white { color: #ffffff; text-shadow: 0 0 10px #ffffff; }
 
-    /* Nama Tim Besar */
-    .team-info { line-height: 1.05; display: flex; flex-direction: column; justify-content: center; text-align: center; }
+    /* Nama Tim */
+    .team-info { line-height: 1.05; display: flex; flex-direction: column; align-items: center; justify-content: center; }
     .team-name { 
-      font-size: 6.5vw;
+      font-size: 7vw;
       font-weight: 700;
       letter-spacing: 2px;
       word-break: break-word;
+      min-height: 1.1em;
     }
 
-    .middle-stats { grid-column: 2; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; }
-    .set-container { display: flex; align-items: center; font-size: 2.5vw; font-weight: bold; margin-bottom: 0.2vw; }
+    /* Bagian Tengah (Liga, Set, Win) */
+    .middle-stats { grid-column: 2; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; overflow: hidden; }
+    
+    /* Nama Liga Ditata Agar Bisa Multi-Line (Bisa Enter) & Tidak Mendorong Kolom Lain */
+    .league-title {
+      font-size: 1.8vw; /* Ukuran disesuaikan agar proporsional */
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 0.3vw;
+      text-align: center;
+      line-height: 1.1;
+      word-break: break-word;
+      width: 100%;
+      max-height: 4em;
+      overflow: hidden;
+    }
+
+    .set-container { display: flex; align-items: center; font-size: 2.2vw; font-weight: bold; margin-bottom: 0.2vw; }
     .set-label { margin: 0 0.8vw; letter-spacing: 2px; }
-    .set-value { font-size: 7vw; line-height: 1; }
+    .set-value { font-size: 6vw; line-height: 1; }
 
-    .wins-container { display: flex; justify-content: space-between; width: 100%; align-items: center; margin-top: 0.5vw; }
+    .wins-container { display: flex; justify-content: space-between; width: 100%; align-items: center; margin-top: 0.3vw; }
     .win-item { display: flex; flex-direction: column; align-items: center; }
-    .win-value { font-size: 5.5vw; line-height: 1; }
-    .win-label { font-size: 1.8vw; color: #ffffff; font-weight: bold; letter-spacing: 1px; }
+    .win-value { font-size: 5vw; line-height: 1; }
+    .win-label { font-size: 1.6vw; color: #ffffff; font-weight: bold; letter-spacing: 1px; }
 
+    /* Skor Utama */
     .score-container { 
       grid-row: 2; 
       font-size: 21vw; 
@@ -84,6 +100,7 @@
     .score-team-a { grid-column: 1; }
     .score-team-b { grid-column: 3; }
 
+    /* Footer L/R */
     .footer-label { position: absolute; bottom: 1.5vw; font-size: 3.5vw; font-weight: bold; }
     .label-l { left: 3vw; } 
     .label-r { right: 3vw; }
@@ -92,38 +109,40 @@
 <body>
 
   <div class="led-board">
-    <!-- TIM A (Dikosongkan bawaannya agar tidak berkedip) -->
+    <!-- TIM A -->
     <div class="team-info score-team-a">
-      <div class="team-name led-red">&nbsp;</div>
+      <div class="team-name led-red">TIM A</div>
     </div>
 
     <!-- TIM B -->
     <div class="team-info score-team-b">
-      <div class="team-name led-red">&nbsp;</div>
+      <div class="team-name led-red">TIM B</div>
     </div>
 
-    <!-- STATS TENGAH -->
+    <!-- TENGAH -->
     <div class="middle-stats">
+      <div id="league-name" class="league-title led-yellow">INPUT NAMA LIGA DI SINI</div>
+
       <div class="set-container led-white">
         <span>&lt;</span><span class="set-label">SET</span><span>&gt;</span>
       </div>
-      <div id="set-value" class="set-value digital-font led-yellow">-</div>
+      <div id="set-value" class="set-value digital-font led-yellow">1</div>
       
       <div class="wins-container">
         <div class="win-item">
-          <div id="win-a" class="win-value digital-font led-yellow">-</div>
+          <div id="win-a" class="win-value digital-font led-yellow">0</div>
           <div class="win-label">WIN</div>
         </div>
         <div class="win-item">
-          <div id="win-b" class="win-value digital-font led-yellow">-</div>
+          <div id="win-b" class="win-value digital-font led-yellow">0</div>
           <div class="win-label">WIN</div>
         </div>
       </div>
     </div>
 
     <!-- SKOR UTAMA -->
-    <div id="score-a" class="score-container score-team-a digital-font led-blue">--</div>
-    <div id="score-b" class="score-container score-team-b digital-font led-green">--</div>
+    <div id="score-a" class="score-container score-team-a digital-font led-blue">00</div>
+    <div id="score-b" class="score-container score-team-b digital-font led-green">00</div>
 
     <div class="footer-label label-l led-white">L</div>
     <div class="footer-label label-r led-white">R</div>
@@ -146,22 +165,27 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    const formatTwoDigits = (num) => {
-      const parsed = parseInt(num, 10);
-      return isNaN(parsed) ? '00' : String(parsed).padStart(2, '0');
+    const urlParams = new URLSearchParams(window.location.search);
+    const roomId = urlParams.get('room') || 'demo';
+
+    const formatScore = (val) => {
+      if (val === undefined || val === null) return '00';
+      const num = parseInt(val, 10);
+      return isNaN(num) ? '00' : String(num).padStart(2, '0');
     };
 
-    onValue(ref(db, 'scoreboard'), (snapshot) => {
+    onValue(ref(db, `scoreboard/${roomId}`), (snapshot) => {
       const data = snapshot.val();
       if (data) {
-        document.getElementById('score-a').innerText = formatTwoDigits(data.teamA_score);
-        document.getElementById('score-b').innerText = formatTwoDigits(data.teamB_score);
+        document.getElementById('score-a').innerText = formatScore(data.teamA_score);
+        document.getElementById('score-b').innerText = formatScore(data.teamB_score);
         document.getElementById('set-value').innerText = data.set_value ?? 1;
         document.getElementById('win-a').innerText = data.teamA_wins ?? 0;
         document.getElementById('win-b').innerText = data.teamB_wins ?? 0;
         
-        if(data.teamA_name) document.querySelector('.score-team-a .team-name').innerHTML = data.teamA_name;
-        if(data.teamB_name) document.querySelector('.score-team-b .team-name').innerHTML = data.teamB_name;
+        if (data.league_name) document.getElementById('league-name').innerHTML = data.league_name;
+        if (data.teamA_name) document.querySelector('.score-team-a .team-name').innerHTML = data.teamA_name;
+        if (data.teamB_name) document.querySelector('.score-team-b .team-name').innerHTML = data.teamB_name;
       }
     });
   </script>
