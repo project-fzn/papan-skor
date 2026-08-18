@@ -14,7 +14,7 @@
     .mini-scores { display: flex; justify-content: space-between; font-size: 36px; font-weight: bold; }
     .mini-score-a { color: #00f0ff; }
     .mini-score-b { color: #00ff66; }
-    .mini-stats { font-size: 12px; color: #ffb700; margin-top: 5px; }
+    .mini-stats { font-size: 12px; color: #ffb700; margin-top: 5px; font-weight: bold; }
 
     /* FORM & BUTTONS */
     .card { background: #1e1e1e; padding: 12px; border-radius: 8px; margin-bottom: 12px; }
@@ -25,8 +25,11 @@
     .btn-gold { background: #ffb700; color: #000; }
     .btn-blue { background: #00f0ff; color: #000; font-size: 18px; }
     .btn-green { background: #00ff66; color: #000; font-size: 18px; }
+    .btn-orange { background: #ff7700; color: #fff; }
+    .btn-purple { background: #9900ff; color: #fff; }
     .btn-danger { background: #ff3333; color: #fff; }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
   </style>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -59,16 +62,16 @@
     <button class="btn btn-gold" onclick="updateTournament()">Update Turnamen & Logo</button>
   </div>
 
-  <!-- INPUT NAMA TIM (DENGAN TEXTAREA AGAR BISA ENTER / ATAS-BAWAH) -->
+  <!-- INPUT NAMA TIM -->
   <div class="card">
     <div class="grid-2">
       <div>
         <label>Nama Tim A (Gunakan Enter untuk 2 baris):</label>
-        <textarea id="inputTeamA" placeholder="TESTING&#10;TIM A"></textarea>
+        <textarea id="inputTeamA" placeholder="FAUZAN&#10;TIO"></textarea>
       </div>
       <div>
         <label>Nama Tim B (Gunakan Enter untuk 2 baris):</label>
-        <textarea id="inputTeamB" placeholder="TESTING&#10;TIM B"></textarea>
+        <textarea id="inputTeamB" placeholder="IRFAN&#10;RUDI"></textarea>
       </div>
     </div>
     <button class="btn btn-gold" onclick="updateTeams()">Update Nama Tim</button>
@@ -78,12 +81,31 @@
   <div class="card">
     <div class="grid-2">
       <div>
-        <button class="btn btn-blue" onclick="changeScore('scoreA', 1)">+1 TIM A</button>
-        <button class="btn btn-danger" onclick="changeScore('scoreA', -1)">-1 TIM A</button>
+        <button class="btn btn-blue" onclick="changeValue('scoreA', 1)">+1 TIM A</button>
+        <button class="btn btn-danger" onclick="changeValue('scoreA', -1)">-1 TIM A</button>
       </div>
       <div>
-        <button class="btn btn-green" onclick="changeScore('scoreB', 1)">+1 TIM B</button>
-        <button class="btn btn-danger" onclick="changeScore('scoreB', -1)">-1 TIM B</button>
+        <button class="btn btn-green" onclick="changeValue('scoreB', 1)">+1 TIM B</button>
+        <button class="btn btn-danger" onclick="changeValue('scoreB', -1)">-1 TIM B</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- KONTROL SET & WIN (BARU DITAMBAHKAN KEMBALI) -->
+  <div class="card">
+    <label style="text-align: center; font-weight: bold; margin-bottom: 8px;">⚙️ KONTROL SET & WIN</label>
+    <div class="grid-3">
+      <div>
+        <button class="btn btn-orange" onclick="changeValue('winA', 1)">+1 WIN A</button>
+        <button class="btn btn-danger" onclick="changeValue('winA', -1)">-1 WIN A</button>
+      </div>
+      <div>
+        <button class="btn btn-purple" onclick="changeValue('set', 1)">+1 SET</button>
+        <button class="btn btn-danger" onclick="changeValue('set', -1)">-1 SET</button>
+      </div>
+      <div>
+        <button class="btn btn-orange" onclick="changeValue('winB', 1)">+1 WIN B</button>
+        <button class="btn btn-danger" onclick="changeValue('winB', -1)">-1 WIN B</button>
       </div>
     </div>
   </div>
@@ -111,7 +133,7 @@
     const roomId = urlParams.get('room') || 'default';
     const roomRef = db.ref('rooms/' + roomId);
 
-    // Sync Data ke Mini Score Visibility Wasit (Tanpa Alert Pop-up)
+    // Sync Data ke Mini Score Visibility Wasit
     roomRef.on('value', (snapshot) => {
       const data = snapshot.val();
       if (data) {
@@ -125,28 +147,29 @@
       }
     });
 
-    // Update Turnamen & Logo (Tanpa Alert Pop-up)
+    // Update Turnamen & Logo
     function updateTournament() {
       const name = document.getElementById('inputLeagueName').value;
       const logo = document.getElementById('inputLeagueLogo').value;
       roomRef.update({ leagueName: name, leagueLogo: logo });
     }
 
-    // Update Nama Tim (Mengubah tombol Enter / Newline menjadi <br>)
+    // Update Nama Tim (Mendukung Enter)
     function updateTeams() {
       let a = document.getElementById('inputTeamA').value.replace(/\n/g, '<br>');
       let b = document.getElementById('inputTeamB').value.replace(/\n/g, '<br>');
       roomRef.update({ nameA: a, nameB: b });
     }
 
-    // Tambah/Kurang Skor Real-time
-    function changeScore(field, val) {
+    // Tambah/Kurang Nilai (Skor, Set, Win A, Win B)
+    function changeValue(field, val) {
       roomRef.child(field).transaction((current) => {
-        return Math.max(0, (current || 0) + val);
+        let minVal = (field === 'set') ? 1 : 0; // Minimal set adalah 1, lainnya 0
+        return Math.max(minVal, (current || 0) + val);
       });
     }
 
-    // Reset Skor
+    // Reset Skor Total
     function resetScores() {
       roomRef.update({ scoreA: 0, scoreB: 0, set: 1, winA: 0, winB: 0 });
     }
