@@ -23,7 +23,6 @@
       text-transform: uppercase;
     }
 
-    /* MENAMBAHKAN TRANSISI SMOOTH AGAR TIDAK BERKEDIP SAAT REFRESH */
     .led-board {
       width: 96vw;
       height: 54vw;
@@ -38,8 +37,8 @@
       gap: 1vw;
       position: relative;
       box-shadow: 0 0 50px rgba(0,0,0,0.9);
-      opacity: 0; /* Sembunyikan default saat memuat */
-      transition: opacity 0.2s ease-in-out; /* Efek memudar halus saat data siap */
+      opacity: 0;
+      transition: opacity 0.2s ease-in-out;
     }
 
     .digital-font {
@@ -54,7 +53,7 @@
     .led-green { color: #00ff66; text-shadow: 0 0 25px rgba(0,255,102,0.8), 0 0 8px #00cc44; }
     .led-white { color: #ffffff; text-shadow: 0 0 10px #ffffff; }
 
-    /* Nama Tim (Dibuat Center / Rata Tengah) */
+    /* Nama Tim */
     .team-info { 
       line-height: 1.05; 
       display: flex; 
@@ -73,7 +72,7 @@
       width: 100%;
     }
 
-    /* Bagian Tengah (Logo, Liga, Set, Win) */
+    /* Bagian Tengah */
     .middle-stats { 
       grid-column: 2; 
       display: flex; 
@@ -109,9 +108,22 @@
     .set-value { font-size: 6vw; line-height: 1; }
 
     .wins-container { display: flex; justify-content: space-between; width: 100%; align-items: center; margin-top: 0.3vw; }
-    .win-item { display: flex; flex-direction: column; align-items: center; }
+    .win-item { display: flex; flex-direction: column; align-items: center; position: relative; }
     .win-value { font-size: 5vw; line-height: 1; }
     .win-label { font-size: 1.6vw; color: #ffffff; font-weight: bold; letter-spacing: 1px; }
+
+    /* INDIKATOR SERVIS (BOLA / KOK) */
+    .serve-icon {
+      font-size: 1.8vw;
+      position: absolute;
+      top: -2vw;
+      display: none;
+      animation: pulse-glow 1s infinite alternate;
+    }
+    @keyframes pulse-glow {
+      0% { transform: scale(1); filter: drop-shadow(0 0 2px #ffcc00); }
+      100% { transform: scale(1.2); filter: drop-shadow(0 0 10px #ffcc00); }
+    }
 
     /* Skor Utama */
     .score-container { 
@@ -134,7 +146,6 @@
 </head>
 <body>
 
-  <!-- ID boardContainer ditambahkan untuk mengontrol visibilitas secara mulus -->
   <div id="boardContainer" class="led-board">
     <!-- TIM A -->
     <div class="team-info score-team-a">
@@ -150,7 +161,7 @@
     <div class="middle-stats">
       <img id="league-logo" class="league-logo-img" src="" alt="" style="display: none;">
       
-      <div id="league-name" class="league-title led-yellow"></div>
+      <div id="league-name" class="league-title led-yellow">INPUT NAMA LIGA DI SINI</div>
 
       <div class="set-container led-white">
         <span>&lt;</span><span class="set-label">SET</span><span>&gt;</span>
@@ -159,10 +170,12 @@
       
       <div class="wins-container">
         <div class="win-item">
+          <span id="serve-a" class="serve-icon">🏸</span>
           <div id="win-a" class="win-value digital-font led-yellow">0</div>
           <div class="win-label">WIN</div>
         </div>
         <div class="win-item">
+          <span id="serve-b" class="serve-icon">🏸</span>
           <div id="win-b" class="win-value digital-font led-yellow">0</div>
           <div class="win-label">WIN</div>
         </div>
@@ -216,6 +229,7 @@
         if (data.teamA_name) document.querySelector('.score-team-a .team-name').innerHTML = data.teamA_name;
         if (data.teamB_name) document.querySelector('.score-team-b .team-name').innerHTML = data.teamB_name;
 
+        // TAMPILKAN LOGO
         const logoEl = document.getElementById('league-logo');
         if (data.league_logo && data.league_logo.trim() !== '') {
           logoEl.src = data.league_logo;
@@ -224,7 +238,20 @@
           logoEl.style.display = 'none';
         }
 
-        // Tampilkan papan skor secara langsung dan mulus setelah data Firebase diterima
+        // LOGIKA INDIKATOR SERVIS (BOLA / KOK)
+        const serveA = document.getElementById('serve-a');
+        const serveB = document.getElementById('serve-b');
+        if (data.service === 'teamA') {
+          serveA.style.display = 'block';
+          serveB.style.display = 'none';
+        } else if (data.service === 'teamB') {
+          serveA.style.display = 'none';
+          serveB.style.display = 'block';
+        } else {
+          serveA.style.display = 'none';
+          serveB.style.display = 'none';
+        }
+
         document.getElementById('boardContainer').style.opacity = '1';
       }
     });
