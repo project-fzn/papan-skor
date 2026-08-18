@@ -3,299 +3,122 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Remot Papan Skor Wasit</title>
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
-
+  <title>Remot Wasit - Skor Digital</title>
   <style>
-    * { box-sizing: border-box; }
-    body { font-family: sans-serif; background-color: #121212; color: #fff; margin: 0; padding: 12px; }
-
-    /* POPUP INPUT PIN */
-    .pin-overlay {
-      position: fixed;
-      top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(0,0,0,0.95);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-    }
-    .pin-box {
-      background: #1e1e1e;
-      padding: 25px;
-      border-radius: 12px;
-      border: 2px solid #ffc107;
-      text-align: center;
-      width: 85%;
-      max-width: 320px;
-    }
-    .pin-input {
-      width: 100%;
-      padding: 12px;
-      font-size: 1.5rem;
-      text-align: center;
-      letter-spacing: 5px;
-      margin: 15px 0;
-      border-radius: 8px;
-      border: 1px solid #444;
-      background: #2b2b2b;
-      color: #ffc107;
-      font-weight: bold;
-    }
-
-    .mini-scoreboard {
-      background-color: #080808;
-      border: 2px solid #333;
-      border-radius: 12px;
-      padding: 12px;
-      margin-bottom: 15px;
-      display: grid;
-      grid-template-columns: 2fr 1fr 2fr;
-      align-items: center;
-      text-align: center;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.8);
-      position: sticky;
-      top: 0;
-      z-index: 99;
-    }
-    .mini-team { display: flex; flex-direction: column; align-items: center; justify-content: center; }
-    .mini-team-name { font-size: 0.9rem; font-weight: bold; color: #ff3333; text-transform: uppercase; line-height: 1.1; height: 2.2em; overflow: hidden; text-align: center; width: 100%; }
-    .mini-score { font-family: 'Orbitron', monospace; font-size: 3rem; font-weight: 900; line-height: 1; margin-top: 5px; text-align: center; }
-    .mini-score-a { color: #00e5ff; }
-    .mini-score-b { color: #00ff66; }
-    
-    .mini-center { display: flex; flex-direction: column; align-items: center; justify-content: center; }
-    .mini-league { font-size: 0.75rem; color: #ffcc00; font-weight: bold; text-transform: uppercase; margin-bottom: 2px; line-height: 1.1; text-align: center; }
-    .mini-set-label { font-size: 0.65rem; color: #aaa; font-weight: bold; }
-    .mini-set-val { font-family: 'Orbitron', monospace; font-size: 1.5rem; color: #ffcc00; font-weight: 900; line-height: 1; }
-    .mini-wins { display: flex; gap: 8px; font-size: 0.75rem; font-weight: bold; color: #ffcc00; margin-top: 2px; }
-
-    .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .card { background: #1e1e1e; border-radius: 12px; padding: 12px; border: 1px solid #333; }
-    .card-full { grid-column: span 2; }
-    .card-title { font-size: 1rem; font-weight: bold; margin-bottom: 8px; text-align: center; border-bottom: 1px solid #333; padding-bottom: 4px; }
-    .team-a-title { color: #00e5ff; }
-    .team-b-title { color: #00ff66; }
-    .set-title { color: #ffcc00; }
-    
-    textarea { width: 100%; background: #2b2b2b; border: 1px solid #444; color: #fff; padding: 8px; border-radius: 6px; font-size: 0.9rem; text-align: center; font-weight: bold; resize: none; }
-    .league-area { height: 45px; }
-    .team-area { height: 50px; }
-    
-    .btn-group { display: flex; gap: 8px; justify-content: center; }
-    button { flex: 1; padding: 14px 5px; font-size: 1.2rem; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; touch-action: manipulation; }
-    button:active { transform: scale(0.95); }
-    .btn-add { background-color: #28a745; color: white; }
-    .btn-sub { background-color: #dc3545; color: white; }
-    .btn-main { background-color: #ffc107; color: black; font-weight: bold; width: 100%; padding: 10px; margin-top: 8px;}
-    .btn-reset { background-color: #6c757d; color: white; width: 100%; margin-top: 15px; padding: 12px; }
-    .label-sm { font-size: 0.8rem; color: #aaa; text-align: center; margin-bottom: 4px; }
+    * { box-sizing: border-box; font-family: sans-serif; }
+    body { background: #121212; color: #fff; padding: 15px; }
+    h2 { text-align: center; color: #ffb700; margin-bottom: 15px; }
+    .card { background: #1e1e1e; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
+    label { font-size: 12px; color: #aaa; display: block; margin-top: 8px; }
+    input { width: 100%; padding: 10px; margin-top: 4px; background: #2a2a2a; border: 1px solid #444; color: #fff; border-radius: 5px; }
+    .btn { width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+    .btn-gold { background: #ffb700; color: #000; }
+    .btn-blue { background: #00f0ff; color: #000; }
+    .btn-green { background: #00ff66; color: #000; }
+    .btn-danger { background: #ff3333; color: #fff; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   </style>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
 
-  <!-- LAYER MASUKKAN PIN -->
-  <div id="pinOverlay" class="pin-overlay">
-    <div class="pin-box">
-      <h3 style="margin:0; color:#ffc107;">🔒 KEAMANAN REMOT</h3>
-      <p style="font-size:0.85rem; color:#ccc; margin-top:5px;">Masukkan PIN 4 Digit Wasit:</p>
-      <input type="password" id="inputPin" class="pin-input" maxlength="4" placeholder="••••">
-      <button class="btn-main" onclick="verifyPin()">MASUK REMOT</button>
-      <p id="pinError" style="color:#ff3333; font-size:0.8rem; margin-top:10px; display:none;">PIN Salah! Silakan coba lagi.</p>
-    </div>
-  </div>
+  <h2>🎮 REMOT WASIT</h2>
 
-  <!-- SCOREBOARD MINI WASIT -->
-  <div class="mini-scoreboard">
-    <div class="mini-team">
-      <div id="disp-name-a" class="mini-team-name">&nbsp;</div>
-      <div id="disp-score-a" class="mini-score mini-score-a">--</div>
-    </div>
-
-    <div class="mini-center">
-      <div id="disp-league" class="mini-league">&nbsp;</div>
-      <div class="mini-set-label">SET</div>
-      <div id="disp-set" class="mini-set-val">-</div>
-      <div class="mini-wins">
-        <span>W:<span id="disp-win-a">-</span></span>
-        <span>|</span>
-        <span>W:<span id="disp-win-b">-</span></span>
-      </div>
-    </div>
-
-    <div class="mini-team">
-      <div id="disp-name-b" class="mini-team-name">&nbsp;</div>
-      <div id="disp-score-b" class="mini-score mini-score-b">--</div>
-    </div>
-  </div>
-
-  <!-- INPUT NAMA LIGA DAN TIM -->
-  <div class="card card-full">
-    <div class="card-title">Pengaturan Pertandingan</div>
+  <!-- CARD 1: PENGATURAN LIGA & TIM -->
+  <div class="card">
+    <h3>⚙️ Info Turnamen</h3>
+    <label>Nama Liga / Turnamen:</label>
+    <input type="text" id="inputLeagueName" placeholder="PHERMANA CUP 2026">
     
-    <div style="margin-bottom: 8px;">
-      <div class="label-sm">NAMA LIGA / TURNAMEN (Enter untuk 2 baris)</div>
-      <textarea id="inputLeague" class="league-area" placeholder="Nama Liga"></textarea>
-    </div>
-
-    <div class="label-sm">NAMA TIM (Enter untuk 2 baris)</div>
-    <div style="display: flex; gap: 8px;">
-      <textarea id="inputTeamA" class="team-area" placeholder="Nama Tim A"></textarea>
-      <textarea id="inputTeamB" class="team-area" placeholder="Nama Tim B"></textarea>
-    </div>
-    <button class="btn-main" onclick="saveMatchInfo()">Update Informasi Match</button>
+    <label>URL Logo (Link Gambar PNG/JPG):</label>
+    <input type="text" id="inputLeagueLogo" placeholder="https://i.ibb.co/example/logo.png">
+    
+    <button class="btn btn-gold" onclick="saveTournamentInfo()">Simpan Info Turnamen</button>
   </div>
 
-  <div class="grid-container" style="margin-top: 12px;">
-    <!-- TIM A -->
-    <div class="card">
-      <div class="card-title team-a-title">SKOR A</div>
-      <div class="btn-group">
-        <button class="btn-add" onclick="updateScore('teamA', 1)">+1</button>
-        <button class="btn-sub" onclick="updateScore('teamA', -1)">-1</button>
+  <div class="card">
+    <h3>🛡️ Nama Tim</h3>
+    <div class="grid-2">
+      <div>
+        <label>Tim A (Kiri):</label>
+        <input type="text" id="inputTeamA" placeholder="TIM A">
       </div>
-      <div style="margin-top: 10px;">
-        <div class="label-sm">WIN A</div>
-        <div class="btn-group">
-          <button class="btn-add" style="padding:6px" onclick="updateWin('teamA', 1)">+1</button>
-          <button class="btn-sub" style="padding:6px" onclick="updateWin('teamA', -1)">-1</button>
-        </div>
+      <div>
+        <label>Tim B (Kanan):</label>
+        <input type="text" id="inputTeamB" placeholder="TIM B">
       </div>
     </div>
+    <button class="btn btn-gold" onclick="saveTeamNames()">Simpan Nama Tim</button>
+  </div>
 
-    <!-- TIM B -->
-    <div class="card">
-      <div class="card-title team-b-title">SKOR B</div>
-      <div class="btn-group">
-        <button class="btn-add" onclick="updateScore('teamB', 1)">+1</button>
-        <button class="btn-sub" onclick="updateScore('teamB', -1)">-1</button>
+  <!-- CARD 2: KONTROL SKOR HASIL REALTIME -->
+  <div class="card">
+    <h3>🏆 Kontrol Skor</h3>
+    <div class="grid-2">
+      <div>
+        <button class="btn btn-blue" onclick="changeScore('scoreA', 1)">+1 SKOR A</button>
+        <button class="btn btn-danger" onclick="changeScore('scoreA', -1)">-1 SKOR A</button>
       </div>
-      <div style="margin-top: 10px;">
-        <div class="label-sm">WIN B</div>
-        <div class="btn-group">
-          <button class="btn-add" style="padding:6px" onclick="updateWin('teamB', 1)">+1</button>
-          <button class="btn-sub" style="padding:6px" onclick="updateWin('teamB', -1)">-1</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- SET -->
-    <div class="card card-full">
-      <div class="card-title set-title">KONTROL SET</div>
-      <div class="btn-group">
-        <button class="btn-add" style="background:#ffc107; color:#000" onclick="updateSet(1)">+ SET</button>
-        <button class="btn-sub" style="background:#e0a800; color:#000" onclick="updateSet(-1)">- SET</button>
+      <div>
+        <button class="btn btn-green" onclick="changeScore('scoreB', 1)">+1 SKOR B</button>
+        <button class="btn btn-danger" onclick="changeScore('scoreB', -1)">-1 SKOR B</button>
       </div>
     </div>
   </div>
 
-  <button class="btn-reset" onclick="resetAll()">🔄 Reset Semua Skor & Set</button>
+  <!-- CARD 3: RESET -->
+  <div class="card">
+    <button class="btn btn-danger" onclick="resetAll()">⚠️ RESET TOTAL SKOR</button>
+  </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, runTransaction, update, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-
+  <script>
+    // ⚠️ Ganti Konfigurasi Firebase Anda di Sini (Samakan dengan index.html)
     const firebaseConfig = {
-      apiKey: "AIzaSyB_5DbpY5XqNMXPTBljXK0gm4zyH-wkAiI",
-      authDomain: "papanscore.firebaseapp.com",
-      databaseURL: "https://papanscore-default-rtdb.firebaseio.com",
-      projectId: "papanscore",
-      storageBucket: "papanscore.firebasestorage.app",
-      messagingSenderId: "449160493063",
-      appId: "1:449160493063:web:364dedee3634cf9a18d2a2"
+      apiKey: "API_KEY_ANDA",
+      authDomain: "PROJECT_ID.firebaseapp.com",
+      databaseURL: "https://PROJECT_ID-default-rtdb.firebaseio.com",
+      projectId: "PROJECT_ID",
+      storageBucket: "PROJECT_ID.appspot.com",
+      messagingSenderId: "SENDER_ID",
+      appId: "APP_ID"
     };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
     const urlParams = new URLSearchParams(window.location.search);
-    const roomId = urlParams.get('room') || 'demo';
-    
-    // 🔑 PIN DEFAULT (Anda bisa ubah PIN ini misal: '1234')
-    const DEFAULT_PIN = "2305"; 
+    const roomId = urlParams.get('room') || 'default';
+    const roomRef = db.ref('rooms/' + roomId);
 
-    // VERIFIKASI PIN DARI SESSION STORAGE (AGAR HP REDUP TIDAK MINTA RE-ENTER)
-    if (sessionStorage.getItem(`pin_auth_${roomId}`) === "true") {
-      document.getElementById('pinOverlay').style.display = 'none';
+    // Simpan Info Turnamen & Logo
+    function saveTournamentInfo() {
+      const name = document.getElementById('inputLeagueName').value;
+      const logo = document.getElementById('inputLeagueLogo').value;
+      roomRef.update({ leagueName: name, leagueLogo: logo });
+      alert('Info Turnamen Terupdate!');
     }
 
-    window.verifyPin = function() {
-      const input = document.getElementById('inputPin').value;
-      if (input === DEFAULT_PIN) {
-        sessionStorage.setItem(`pin_auth_${roomId}`, "true");
-        document.getElementById('pinOverlay').style.display = 'none';
-      } else {
-        document.getElementById('pinError').style.display = 'block';
+    // Simpan Nama Tim
+    function saveTeamNames() {
+      const a = document.getElementById('inputTeamA').value;
+      const b = document.getElementById('inputTeamB').value;
+      roomRef.update({ nameA: a, nameB: b });
+      alert('Nama Tim Terupdate!');
+    }
+
+    // Tambah / Kurang Skor
+    function changeScore(field, val) {
+      roomRef.child(field).transaction((current) => {
+        return Math.max(0, (current || 0) + val);
+      });
+    }
+
+    // Reset All
+    function resetAll() {
+      if(confirm("Yakin ingin reset skor menjadi 0?")) {
+        roomRef.update({ scoreA: 0, scoreB: 0, set: 1, winA: 0, winB: 0 });
       }
-    };
-
-    const formatScore = (val) => {
-      if (val === undefined || val === null) return '00';
-      const num = parseInt(val, 10);
-      return isNaN(num) ? '00' : String(num).padStart(2, '0');
-    };
-
-    onValue(ref(db, `scoreboard/${roomId}`), (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        document.getElementById('disp-score-a').innerText = formatScore(data.teamA_score);
-        document.getElementById('disp-score-b').innerText = formatScore(data.teamB_score);
-        document.getElementById('disp-set').innerText = data.set_value ?? 1;
-        document.getElementById('disp-win-a').innerText = data.teamA_wins ?? 0;
-        document.getElementById('disp-win-b').innerText = data.teamB_wins ?? 0;
-        
-        if (data.league_name) document.getElementById('disp-league').innerHTML = data.league_name;
-        if (data.teamA_name) document.getElementById('disp-name-a').innerHTML = data.teamA_name;
-        if (data.teamB_name) document.getElementById('disp-name-b').innerHTML = data.teamB_name;
-      }
-    });
-
-    window.updateScore = function(team, amount) {
-      runTransaction(ref(db, `scoreboard/${roomId}/${team}_score`), (curr) => {
-        let val = (parseInt(curr, 10) || 0) + amount;
-        return val < 0 ? 0 : val;
-      });
-    };
-
-    window.updateWin = function(team, amount) {
-      runTransaction(ref(db, `scoreboard/${roomId}/${team}_wins`), (curr) => {
-        let val = (parseInt(curr, 10) || 0) + amount;
-        return val < 0 ? 0 : val;
-      });
-    };
-
-    window.updateSet = function(amount) {
-      runTransaction(ref(db, `scoreboard/${roomId}/set_value`), (curr) => {
-        let val = (parseInt(curr, 10) || 1) + amount;
-        return val < 1 ? 1 : val;
-      });
-    };
-
-    window.saveMatchInfo = function() {
-      const league = document.getElementById('inputLeague').value.replace(/\n/g, '<br>');
-      const nameA = document.getElementById('inputTeamA').value.replace(/\n/g, '<br>');
-      const nameB = document.getElementById('inputTeamB').value.replace(/\n/g, '<br>');
-      update(ref(db, `scoreboard/${roomId}`), { 
-        league_name: league,
-        teamA_name: nameA, 
-        teamB_name: nameB 
-      });
-    };
-
-    window.resetAll = function() {
-      if (confirm("Reset semua skor dan set ke 0?")) {
-        update(ref(db, `scoreboard/${roomId}`), {
-          teamA_score: 0, 
-          teamB_score: 0,
-          teamA_wins: 0, 
-          teamB_wins: 0, 
-          set_value: 1
-        });
-      }
-    };
+    }
   </script>
 </body>
 </html>
