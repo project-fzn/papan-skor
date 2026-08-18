@@ -3,188 +3,92 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Papan Skor Digital Modern LED</title>
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
-
-  <style>
-    body {
-      background-color: #000;
-      color: white;
-      font-family: 'Chakra Petch', sans-serif;
-      margin: 0;
-      overflow: hidden;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-transform: uppercase;
-    }
-
-    .led-board {
-      width: 96vw;
-      height: 54vw;
-      border: 8px solid #222;
-      border-radius: 12px;
-      background-color: #050505;
-      padding: 2vw;
-      box-sizing: border-box;
-      display: grid;
-      grid-template-columns: 2.5fr 1.2fr 2.5fr;
-      grid-template-rows: auto 1fr;
-      gap: 1vw;
-      position: relative;
-      box-shadow: 0 0 50px rgba(0,0,0,0.9);
-      /* Sembunyikan papan skor sebelum data Firebase siap agar tidak berkedip */
-      visibility: hidden; 
-    }
-
-    .digital-font {
-      font-family: 'Orbitron', monospace;
-      font-weight: 900;
-    }
-
-    .led-red { color: #ff2a2a; text-shadow: 0 0 20px rgba(255,42,42,0.8), 0 0 5px #ff0000; }
-    .led-yellow { color: #ffcc00; text-shadow: 0 0 20px rgba(255,204,0,0.8), 0 0 5px #ffaa00; }
-    .led-blue { color: #00e5ff; text-shadow: 0 0 25px rgba(0,229,255,0.8), 0 0 8px #00aaff; }
-    .led-green { color: #00ff66; text-shadow: 0 0 25px rgba(0,255,102,0.8), 0 0 8px #00cc44; }
-    .led-white { color: #ffffff; text-shadow: 0 0 10px #ffffff; }
-
-    .team-info { line-height: 1.05; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-    .team-name { 
-      font-size: 7vw;
-      font-weight: 700;
-      letter-spacing: 2px;
-      word-break: break-word;
-      min-height: 1.1em;
-      text-align: center;
-      width: 100%;
-    }
-
-    .middle-stats { grid-column: 2; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; overflow: hidden; }
-    
-    .league-title {
-      font-size: 1.8vw;
-      font-weight: 700;
-      letter-spacing: 1px;
-      margin-bottom: 0.3vw;
-      text-align: center;
-      line-height: 1.1;
-      word-break: break-word;
-      width: 100%;
-      max-height: 4em;
-      overflow: hidden;
-      min-height: 1.1em;
-    }
-
-    .set-container { display: flex; align-items: center; font-size: 2.2vw; font-weight: bold; margin-bottom: 0.2vw; }
-    .set-label { margin: 0 0.8vw; letter-spacing: 2px; }
-    .set-value { font-size: 6vw; line-height: 1; }
-
-    .wins-container { display: flex; justify-content: space-between; width: 100%; align-items: center; margin-top: 0.3vw; }
-    .win-item { display: flex; flex-direction: column; align-items: center; }
-    .win-value { font-size: 5vw; line-height: 1; }
-    .win-label { font-size: 1.6vw; color: #ffffff; font-weight: bold; letter-spacing: 1px; }
-
-    .score-container { 
-      grid-row: 2; 
-      font-size: 21vw; 
-      line-height: 0.85; 
-      text-align: center; 
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .score-team-a { grid-column: 1; }
-    .score-team-b { grid-column: 3; }
-
-    .footer-label { position: absolute; bottom: 1.5vw; font-size: 3.5vw; font-weight: bold; }
-    .label-l { left: 3vw; } 
-    .label-r { right: 3vw; }
-  </style>
+  <title>Skor Digital - Display TV</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
 
-  <!-- KOSONGKAN ELEMEN TEKS AWAL AGAR TIDAK ADA TABRAKAN TAMPILAN -->
-  <div class="led-board" id="led-board">
-    <div class="team-info score-team-a">
-      <div class="team-name led-red">&nbsp;</div>
+  <!-- HEADER -->
+  <div class="scoreboard-header">
+    <div id="nameA" class="team-title">TIM A</div>
+    
+    <div class="center-header">
+      <img id="leagueLogo" src="" alt="Logo" class="league-logo" style="display: none;">
+      <div id="leagueName" class="league-name">PHERMANA CUP 2026</div>
     </div>
-
-    <div class="team-info score-team-b">
-      <div class="team-name led-red">&nbsp;</div>
-    </div>
-
-    <div class="middle-stats">
-      <div id="league-name" class="league-title led-yellow">&nbsp;</div>
-
-      <div class="set-container led-white">
-        <span>&lt;</span><span class="set-label">SET</span><span>&gt;</span>
-      </div>
-      <div id="set-value" class="set-value digital-font led-yellow">-</div>
-      
-      <div class="wins-container">
-        <div class="win-item">
-          <div id="win-a" class="win-value digital-font led-yellow">-</div>
-          <div class="win-label">WIN</div>
-        </div>
-        <div class="win-item">
-          <div id="win-b" class="win-value digital-font led-yellow">-</div>
-          <div class="win-label">WIN</div>
-        </div>
-      </div>
-    </div>
-
-    <div id="score-a" class="score-container score-team-a digital-font led-blue">--</div>
-    <div id="score-b" class="score-container score-team-b digital-font led-green">--</div>
-
-    <div class="footer-label label-l led-white">L</div>
-    <div class="footer-label label-r led-white">R</div>
+    
+    <div id="nameB" class="team-title team-b-title">TIM B</div>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+  <!-- BODY / SKOR -->
+  <div class="scoreboard-body">
+    <div id="scoreA" class="score-box">00</div>
+    
+    <div class="center-stats">
+      <div class="set-label">&lt; SET &gt;</div>
+      <div id="setValue" class="set-val">1</div>
+      <div class="win-container">
+        <div class="win-box"><span id="winA">0</span><br><small>WIN</small></div>
+        <div class="win-box"><span id="winB">0</span><br><small>WIN</small></div>
+      </div>
+    </div>
 
+    <div id="scoreB" class="score-box">00</div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="scoreboard-footer">
+    <div>L</div>
+    <div>R</div>
+  </div>
+
+  <script>
+    // ⚠️ Ganti Konfigurasi Firebase Anda di Sini
     const firebaseConfig = {
-      apiKey: "AIzaSyB_5DbpY5XqNMXPTBljXK0gm4zyH-wkAiI",
-      authDomain: "papanscore.firebaseapp.com",
-      databaseURL: "https://papanscore-default-rtdb.firebaseio.com",
-      projectId: "papanscore",
-      storageBucket: "papanscore.firebasestorage.app",
-      messagingSenderId: "449160493063",
-      appId: "1:449160493063:web:364dedee3634cf9a18d2a2"
+      apiKey: "API_KEY_ANDA",
+      authDomain: "PROJECT_ID.firebaseapp.com",
+      databaseURL: "https://PROJECT_ID-default-rtdb.firebaseio.com",
+      projectId: "PROJECT_ID",
+      storageBucket: "PROJECT_ID.appspot.com",
+      messagingSenderId: "SENDER_ID",
+      appId: "APP_ID"
     };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-
+    // Ambil Parameter Room dari URL (?room=123)
     const urlParams = new URLSearchParams(window.location.search);
-    const roomId = urlParams.get('room') || 'demo';
+    const roomId = urlParams.get('room') || 'default';
 
-    const formatScore = (val) => {
-      if (val === undefined || val === null) return '00';
-      const num = parseInt(val, 10);
-      return isNaN(num) ? '00' : String(num).padStart(2, '0');
-    };
-
-    onValue(ref(db, `scoreboard/${roomId}`), (snapshot) => {
+    // Real-time Listener dari Firebase
+    db.ref('rooms/' + roomId).on('value', (snapshot) => {
       const data = snapshot.val();
       if (data) {
-        document.getElementById('score-a').innerText = formatScore(data.teamA_score);
-        document.getElementById('score-b').innerText = formatScore(data.teamB_score);
-        document.getElementById('set-value').innerText = data.set_value ?? 1;
-        document.getElementById('win-a').innerText = data.teamA_wins ?? 0;
-        document.getElementById('win-b').innerText = data.teamB_wins ?? 0;
-        
-        if (data.league_name) document.getElementById('league-name').innerHTML = data.league_name;
-        if (data.teamA_name) document.querySelector('.score-team-a .team-name').innerHTML = data.teamA_name;
-        if (data.teamB_name) document.querySelector('.score-team-b .team-name').innerHTML = data.teamB_name;
+        document.getElementById('nameA').innerText = data.nameA || 'TIM A';
+        document.getElementById('nameB').innerText = data.nameB || 'TIM B';
+        document.getElementById('scoreA').innerText = String(data.scoreA || 0).padStart(2, '0');
+        document.getElementById('scoreB').innerText = String(data.scoreB || 0).padStart(2, '0');
+        document.getElementById('setValue').innerText = data.set || 1;
+        document.getElementById('winA').innerText = data.winA || 0;
+        document.getElementById('winB').innerText = data.winB || 0;
+
+        // Update Nama Liga
+        if (data.leagueName) {
+          document.getElementById('leagueName').innerText = data.leagueName;
+        }
+
+        // Update Logo Liga
+        const logoImg = document.getElementById('leagueLogo');
+        if (data.leagueLogo && data.leagueLogo.trim() !== "") {
+          logoImg.src = data.leagueLogo;
+          logoImg.style.display = "block";
+        } else {
+          logoImg.style.display = "none";
+        }
       }
-      // Tampilkan papan skor HANYA saat data dari Firebase sudah siap 100%
-      document.getElementById('led-board').style.visibility = 'visible';
     });
   </script>
 </body>
