@@ -3,184 +3,248 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Remot Wasit</title>
+  <title>Remot Papan Skor Wasit</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+
   <style>
-    * { box-sizing: border-box; font-family: sans-serif; }
-    body { background: #121212; color: #fff; padding: 15px; margin: 0; }
-    
-    /* MINI SCOREBOARD FIXED / STICKY (FREEZE SAAT DI-SCROLL) */
-    .mini-scoreboard { 
+    * { box-sizing: border-box; }
+    body { font-family: sans-serif; background-color: #121212; color: #fff; margin: 0; padding: 12px; }
+
+    .mini-scoreboard {
+      background-color: #080808;
+      border: 2px solid #333;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 15px;
+      display: grid;
+      grid-template-columns: 2fr 1fr 2fr;
+      align-items: center;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.8);
       position: sticky;
       top: 0;
-      z-index: 9999;
-      background: #1e1e1e; 
-      border: 2px solid #333; 
-      border-radius: 10px; 
-      padding: 10px; 
-      text-align: center; 
-      margin-bottom: 15px; 
-      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      z-index: 99;
     }
-    .mini-teams { display: flex; justify-content: space-between; font-weight: bold; font-size: 14px; margin-bottom: 5px; }
-    .mini-scores { display: flex; justify-content: space-between; font-size: 36px; font-weight: bold; }
-    .mini-score-a { color: #00f0ff; }
+    .mini-team { display: flex; flex-direction: column; }
+    .mini-team-name { font-size: 0.9rem; font-weight: bold; color: #ff3333; text-transform: uppercase; line-height: 1.1; height: 2.2em; overflow: hidden; }
+    .mini-score { font-family: 'Orbitron', monospace; font-size: 3rem; font-weight: 900; line-height: 1; margin-top: 5px; }
+    .mini-score-a { color: #00e5ff; }
     .mini-score-b { color: #00ff66; }
-    .mini-stats { font-size: 12px; color: #ffb700; margin-top: 5px; font-weight: bold; }
+    
+    .mini-center { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .mini-league { font-size: 0.75rem; color: #ffcc00; font-weight: bold; text-transform: uppercase; margin-bottom: 2px; line-height: 1.1; }
+    .mini-set-label { font-size: 0.65rem; color: #aaa; font-weight: bold; }
+    .mini-set-val { font-family: 'Orbitron', monospace; font-size: 1.5rem; color: #ffcc00; font-weight: 900; line-height: 1; }
+    .mini-wins { display: flex; gap: 8px; font-size: 0.75rem; font-weight: bold; color: #ffcc00; margin-top: 2px; }
 
-    /* FORM & BUTTONS */
-    .card { background: #1e1e1e; padding: 12px; border-radius: 8px; margin-bottom: 12px; }
-    label { font-size: 12px; color: #aaa; display: block; margin-top: 5px; }
-    input, textarea { width: 100%; padding: 8px; margin-top: 3px; background: #2a2a2a; border: 1px solid #444; color: #fff; border-radius: 5px; }
-    textarea { height: 45px; resize: vertical; }
-    .btn { width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 8px; }
-    .btn-gold { background: #ffb700; color: #000; }
-    .btn-blue { background: #00f0ff; color: #000; font-size: 18px; }
-    .btn-green { background: #00ff66; color: #000; font-size: 18px; }
-    .btn-orange { background: #ff7700; color: #fff; }
-    .btn-purple { background: #9900ff; color: #fff; }
-    .btn-danger { background: #ff3333; color: #fff; }
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+    .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .card { background: #1e1e1e; border-radius: 12px; padding: 12px; border: 1px solid #333; }
+    .card-full { grid-column: span 2; }
+    .card-title { font-size: 1rem; font-weight: bold; margin-bottom: 8px; text-align: center; border-bottom: 1px solid #333; padding-bottom: 4px; }
+    .team-a-title { color: #00e5ff; }
+    .team-b-title { color: #00ff66; }
+    .set-title { color: #ffcc00; }
+    
+    textarea, input[type="text"] { width: 100%; background: #2b2b2b; border: 1px solid #444; color: #fff; padding: 8px; border-radius: 6px; font-size: 0.9rem; text-align: center; font-weight: bold; }
+    textarea { resize: none; }
+    .league-area { height: 45px; }
+    .team-area { height: 50px; }
+    
+    .btn-group { display: flex; gap: 8px; justify-content: center; }
+    button { flex: 1; padding: 14px 5px; font-size: 1.2rem; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; touch-action: manipulation; }
+    button:active { transform: scale(0.95); }
+    .btn-add { background-color: #28a745; color: white; }
+    .btn-sub { background-color: #dc3545; color: white; }
+    .btn-main { background-color: #ffc107; color: black; font-weight: bold; width: 100%; padding: 10px; margin-top: 8px;}
+    .btn-reset { background-color: #6c757d; color: white; width: 100%; margin-top: 15px; padding: 12px; }
+    .label-sm { font-size: 0.8rem; color: #aaa; text-align: center; margin-bottom: 4px; }
   </style>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
-<body id="controllerBody" style="opacity: 0; transition: opacity 0.2s ease-in-out;">
+<body>
 
-  <!-- MINI SCORE VISIBILITY WASIT (STICKY ATAS) -->
+  <!-- SCOREBOARD MINI WASIT -->
   <div class="mini-scoreboard">
-    <div class="mini-teams">
-      <span id="miniNameA">...</span>
-      <span id="miniNameB">...</span>
+    <div class="mini-team">
+      <div id="disp-name-a" class="mini-team-name">TIM A</div>
+      <div id="disp-score-a" class="mini-score mini-score-a">00</div>
     </div>
-    <div class="mini-scores">
-      <span id="miniScoreA" class="mini-score-a">--</span>
-      <span id="miniScoreB" class="mini-score-b">--</span>
+
+    <div class="mini-center">
+      <div id="disp-league" class="mini-league">LIGA 1</div>
+      <div class="mini-set-label">SET</div>
+      <div id="disp-set" class="mini-set-val">1</div>
+      <div class="mini-wins">
+        <span>W:<span id="disp-win-a">0</span></span>
+        <span>|</span>
+        <span>W:<span id="disp-win-b">0</span></span>
+      </div>
     </div>
-    <div class="mini-stats">
-      SET: <span id="miniSet">-</span> | WIN A: <span id="miniWinA">-</span> - WIN B: <span id="miniWinB">-</span>
+
+    <div class="mini-team">
+      <div id="disp-name-b" class="mini-team-name">TIM B</div>
+      <div id="disp-score-b" class="mini-score mini-score-b">00</div>
     </div>
   </div>
 
-  <!-- INPUT NAMA LIGA & LOGO -->
-  <div class="card">
-    <label>Nama Liga / Turnamen:</label>
-    <input type="text" id="inputLeagueName" placeholder="PHERMANA CUP 2026">
+  <!-- INPUT NAMA LIGA DAN TIM -->
+  <div class="card card-full">
+    <div class="card-title">Pengaturan Pertandingan</div>
     
-    <label>URL Logo Turnamen (Link Image):</label>
-    <input type="text" id="inputLeagueLogo" placeholder="https://i.postimg.cc/xxx/logo.png">
-    
-    <button class="btn btn-gold" onclick="updateTournament()">Update Turnamen & Logo</button>
+    <div style="margin-bottom: 8px;">
+      <div class="label-sm">NAMA LIGA / TURNAMEN (Enter untuk 2 baris)</div>
+      <textarea id="inputLeague" class="league-area" placeholder="Nama Liga">TURNAMEN VOLI&#10;EGA CUP 2026</textarea>
+    </div>
+
+    <!-- FITUR BARU: INPUT URL LOGO TURNAMEN -->
+    <div style="margin-bottom: 8px;">
+      <div class="label-sm">URL LOGO TURNAMEN (Link Gambar PNG/JPG)</div>
+      <input type="text" id="inputLogo" placeholder="https://link-gambar.com/logo.png">
+    </div>
+
+    <div class="label-sm">NAMA TIM (Enter untuk 2 baris)</div>
+    <div style="display: flex; gap: 8px;">
+      <textarea id="inputTeamA" class="team-area" placeholder="Nama Tim A">GRUNDA&#10;PUTRA</textarea>
+      <textarea id="inputTeamB" class="team-area" placeholder="Nama Tim B">BNI46&#10;JKT</textarea>
+    </div>
+    <button class="btn-main" onclick="saveMatchInfo()">Update Informasi Match</button>
   </div>
 
-  <!-- INPUT NAMA TIM -->
-  <div class="card">
-    <div class="grid-2">
-      <div>
-        <label>Nama Tim A (Gunakan Enter untuk 2 baris):</label>
-        <textarea id="inputTeamA" placeholder="FAUZAN&#10;TIO"></textarea>
+  <div class="grid-container" style="margin-top: 12px;">
+    <!-- TIM A -->
+    <div class="card">
+      <div class="card-title team-a-title">SKOR A</div>
+      <div class="btn-group">
+        <button class="btn-add" onclick="updateScore('teamA', 1)">+1</button>
+        <button class="btn-sub" onclick="updateScore('teamA', -1)">-1</button>
       </div>
-      <div>
-        <label>Nama Tim B (Gunakan Enter untuk 2 baris):</label>
-        <textarea id="inputTeamB" placeholder="IRFAN&#10;RUDI"></textarea>
+      <div style="margin-top: 10px;">
+        <div class="label-sm">WIN A</div>
+        <div class="btn-group">
+          <button class="btn-add" style="padding:6px" onclick="updateWin('teamA', 1)">+1</button>
+          <button class="btn-sub" style="padding:6px" onclick="updateWin('teamA', -1)">-1</button>
+        </div>
       </div>
     </div>
-    <button class="btn btn-gold" onclick="updateTeams()">Update Nama Tim</button>
-  </div>
 
-  <!-- KONTROL SKOR WASIT -->
-  <div class="card">
-    <div class="grid-2">
-      <div>
-        <button class="btn btn-blue" onclick="changeValue('scoreA', 1)">+1 TIM A</button>
-        <button class="btn btn-danger" onclick="changeValue('scoreA', -1)">-1 TIM A</button>
+    <!-- TIM B -->
+    <div class="card">
+      <div class="card-title team-b-title">SKOR B</div>
+      <div class="btn-group">
+        <button class="btn-add" onclick="updateScore('teamB', 1)">+1</button>
+        <button class="btn-sub" onclick="updateScore('teamB', -1)">-1</button>
       </div>
-      <div>
-        <button class="btn btn-green" onclick="changeValue('scoreB', 1)">+1 TIM B</button>
-        <button class="btn btn-danger" onclick="changeValue('scoreB', -1)">-1 TIM B</button>
+      <div style="margin-top: 10px;">
+        <div class="label-sm">WIN B</div>
+        <div class="btn-group">
+          <button class="btn-add" style="padding:6px" onclick="updateWin('teamB', 1)">+1</button>
+          <button class="btn-sub" style="padding:6px" onclick="updateWin('teamB', -1)">-1</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SET -->
+    <div class="card card-full">
+      <div class="card-title set-title">KONTROL SET</div>
+      <div class="btn-group">
+        <button class="btn-add" style="background:#ffc107; color:#000" onclick="updateSet(1)">+ SET</button>
+        <button class="btn-sub" style="background:#e0a800; color:#000" onclick="updateSet(-1)">- SET</button>
       </div>
     </div>
   </div>
 
-  <!-- KONTROL SET & WIN -->
-  <div class="card">
-    <label style="text-align: center; font-weight: bold; margin-bottom: 8px;">⚙️ KONTROL SET & WIN</label>
-    <div class="grid-3">
-      <div>
-        <button class="btn btn-orange" onclick="changeValue('winA', 1)">+1 WIN A</button>
-        <button class="btn btn-danger" onclick="changeValue('winA', -1)">-1 WIN A</button>
-      </div>
-      <div>
-        <button class="btn btn-purple" onclick="changeValue('set', 1)">+1 SET</button>
-        <button class="btn btn-danger" onclick="changeValue('set', -1)">-1 SET</button>
-      </div>
-      <div>
-        <button class="btn btn-orange" onclick="changeValue('winB', 1)">+1 WIN B</button>
-        <button class="btn btn-danger" onclick="changeValue('winB', -1)">-1 WIN B</button>
-      </div>
-    </div>
-  </div>
+  <button class="btn-reset" onclick="resetAll()">🔄 Reset Semua Skor & Set</button>
 
-  <!-- RESET -->
-  <div class="card">
-    <button class="btn btn-danger" onclick="resetScores()">RESET SKOR</button>
-  </div>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, runTransaction, update, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-  <script>
     const firebaseConfig = {
-      apiKey: "AIzaSyB_5Dbpy5XqNMXPTBljXK0gm4zyH-wkAiI",
+      apiKey: "AIzaSyB_5DbpY5XqNMXPTBljXK0gm4zyH-wkAiI",
       authDomain: "papanscore.firebaseapp.com",
       databaseURL: "https://papanscore-default-rtdb.firebaseio.com",
       projectId: "papanscore",
       storageBucket: "papanscore.firebasestorage.app",
       messagingSenderId: "449160493063",
-      appId: "1:449160493063:web:364dedee3634cf9a18d2a2",
-      measurementId: "G-49GMLNNH3W"
+      appId: "1:449160493063:web:364dedee3634cf9a18d2a2"
     };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
     const urlParams = new URLSearchParams(window.location.search);
-    const roomId = urlParams.get('room') || 'default';
-    const roomRef = db.ref('rooms/' + roomId);
+    const roomId = urlParams.get('room') || 'demo';
 
-    roomRef.on('value', (snapshot) => {
+    const formatScore = (val) => {
+      if (val === undefined || val === null) return '00';
+      const num = parseInt(val, 10);
+      return isNaN(num) ? '00' : String(num).padStart(2, '0');
+    };
+
+    onValue(ref(db, `scoreboard/${roomId}`), (snapshot) => {
       const data = snapshot.val();
       if (data) {
-        document.getElementById('miniNameA').innerHTML = data.nameA || 'TIM A';
-        document.getElementById('miniNameB').innerHTML = data.nameB || 'TIM B';
-        document.getElementById('miniScoreA').innerText = String(data.scoreA || 0).padStart(2, '0');
-        document.getElementById('miniScoreB').innerText = String(data.scoreB || 0).padStart(2, '0');
-        document.getElementById('miniSet').innerText = data.set || 1;
-        document.getElementById('miniWinA').innerText = data.winA || 0;
-        document.getElementById('miniWinB').innerText = data.winB || 0;
-
-        document.getElementById('controllerBody').style.opacity = '1';
+        document.getElementById('disp-score-a').innerText = formatScore(data.teamA_score);
+        document.getElementById('disp-score-b').innerText = formatScore(data.teamB_score);
+        document.getElementById('disp-set').innerText = data.set_value ?? 1;
+        document.getElementById('disp-win-a').innerText = data.teamA_wins ?? 0;
+        document.getElementById('disp-win-b').innerText = data.teamB_wins ?? 0;
+        
+        if (data.league_name) document.getElementById('disp-league').innerHTML = data.league_name;
+        if (data.teamA_name) document.getElementById('disp-name-a').innerHTML = data.teamA_name;
+        if (data.teamB_name) document.getElementById('disp-name-b').innerHTML = data.teamB_name;
+        if (data.league_logo) document.getElementById('inputLogo').value = data.league_logo;
       }
     });
 
-    function updateTournament() {
-      const name = document.getElementById('inputLeagueName').value;
-      const logo = document.getElementById('inputLeagueLogo').value;
-      roomRef.update({ leagueName: name, leagueLogo: logo });
-    }
-
-    function updateTeams() {
-      let a = document.getElementById('inputTeamA').value.replace(/\n/g, '<br>');
-      let b = document.getElementById('inputTeamB').value.replace(/\n/g, '<br>');
-      roomRef.update({ nameA: a, nameB: b });
-    }
-
-    function changeValue(field, val) {
-      roomRef.child(field).transaction((current) => {
-        let minVal = (field === 'set') ? 1 : 0;
-        return Math.max(minVal, (current || 0) + val);
+    window.updateScore = function(team, amount) {
+      runTransaction(ref(db, `scoreboard/${roomId}/${team}_score`), (curr) => {
+        let val = (parseInt(curr, 10) || 0) + amount;
+        return val < 0 ? 0 : val;
       });
-    }
+    };
 
-    function resetScores() {
-      roomRef.update({ scoreA: 0, scoreB: 0, set: 1, winA: 0, winB: 0 });
-    }
+    window.updateWin = function(team, amount) {
+      runTransaction(ref(db, `scoreboard/${roomId}/${team}_wins`), (curr) => {
+        let val = (parseInt(curr, 10) || 0) + amount;
+        return val < 0 ? 0 : val;
+      });
+    };
+
+    window.updateSet = function(amount) {
+      runTransaction(ref(db, `scoreboard/${roomId}/set_value`), (curr) => {
+        let val = (parseInt(curr, 10) || 1) + amount;
+        return val < 1 ? 1 : val;
+      });
+    };
+
+    window.saveMatchInfo = function() {
+      const league = document.getElementById('inputLeague').value.replace(/\n/g, '<br>');
+      const logo = document.getElementById('inputLogo').value.trim();
+      const nameA = document.getElementById('inputTeamA').value.replace(/\n/g, '<br>');
+      const nameB = document.getElementById('inputTeamB').value.replace(/\n/g, '<br>');
+      
+      update(ref(db, `scoreboard/${roomId}`), { 
+        league_name: league,
+        league_logo: logo,
+        teamA_name: nameA, 
+        teamB_name: nameB 
+      });
+    };
+
+    window.resetAll = function() {
+      if (confirm("Reset semua skor dan set ke 0?")) {
+        update(ref(db, `scoreboard/${roomId}`), {
+          teamA_score: 0, 
+          teamB_score: 0,
+          teamA_wins: 0, 
+          teamB_wins: 0, 
+          set_value: 1
+        });
+      }
+    };
   </script>
 </body>
 </html>
