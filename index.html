@@ -23,7 +23,7 @@
       text-transform: uppercase;
     }
 
-    /* GRID DIKUNCI PRESISI SESUAI CODE AWAL AGAR LAYOUT TIDAK BERGESER SAMA SEKALI */
+    /* GRID KUNCI DENGAN PROPORSI HEIGHT YANG LEBIH TINGGI UNTUK BARIS ATAS */
     .led-board {
       width: 96vw;
       height: 54vw;
@@ -33,8 +33,8 @@
       padding: 2vw;
       box-sizing: border-box;
       display: grid;
-      grid-template-columns: 2.5fr 1.2fr 2.5fr; /* Lebar kolom persis seperti awal */
-      grid-template-rows: 13vw 1fr; /* Tinggi baris atas dikunci ketat */
+      grid-template-columns: 2.5fr 1.2fr 2.5fr;
+      grid-template-rows: 17vw 1fr; /* Diperluas dari 13vw ke 17vw agar 3 baris muat lega */
       gap: 1vw;
       position: relative;
       box-shadow: 0 0 50px rgba(0,0,0,0.9);
@@ -54,47 +54,47 @@
     .led-green { color: #00ff66; text-shadow: 0 0 25px rgba(0,255,102,0.8), 0 0 8px #00cc44; }
     .led-white { color: #ffffff; text-shadow: 0 0 10px #ffffff; }
 
-    /* Nama Tim TERKUNCI POSISI (CENTER & FIXED HEIGHT) */
+    /* NAMA TIM (UKURAN DIPERSEUAIKAN AGAR TIDAK TERPOTONG) */
     .team-info { 
-      line-height: 1.05; 
+      line-height: 0.95; 
       display: flex; 
       flex-direction: column; 
       align-items: center; 
       justify-content: center; 
       text-align: center;
-      height: 13vw; /* Dikunci sama dengan tinggi row 1 */
+      height: 17vw;
       overflow: hidden;
     }
     .team-name { 
-      font-size: 6.5vw;
+      font-size: clamp(2.5rem, 4.8vw, 6.5vw); /* Otomatis mengecil jika kalimat panjang / 3 baris */
       font-weight: 700;
-      letter-spacing: 2px;
+      letter-spacing: 1px;
       word-break: break-word;
       text-align: center;
       width: 100%;
     }
 
-    /* Bagian Tengah (Liga, Set, Win) TERKUNCI TOTALLY */
+    /* Bagian Tengah (Liga, Set, Win) TERKUNCI TOTAL */
     .middle-stats { 
       grid-column: 2; 
       display: flex; 
       flex-direction: column; 
       align-items: center; 
-      justify-content: flex-start; 
+      justify-content: center; 
       overflow: hidden; 
       height: 100%;
     }
     
     .league-logo-img {
-      max-width: 7vw;
-      max-height: 7vw;
+      max-width: 6.5vw;
+      max-height: 6.5vw;
       object-fit: contain;
       margin-bottom: 0.2vw;
       filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
     }
 
     .league-title {
-      font-size: 1.8vw;
+      font-size: 1.6vw;
       font-weight: 700;
       letter-spacing: 1px;
       margin-bottom: 0.3vw;
@@ -106,16 +106,16 @@
       overflow: hidden;
     }
 
-    .set-container { display: flex; align-items: center; font-size: 2.2vw; font-weight: bold; margin-bottom: 0.2vw; }
+    .set-container { display: flex; align-items: center; font-size: 2vw; font-weight: bold; margin-bottom: 0.2vw; }
     .set-label { margin: 0 0.8vw; letter-spacing: 2px; }
-    .set-value { font-size: 6vw; line-height: 1; }
+    .set-value { font-size: 5.5vw; line-height: 1; }
 
     .wins-container { display: flex; justify-content: space-between; width: 100%; align-items: center; margin-top: 0.3vw; position: relative; }
     .win-item { display: flex; flex-direction: column; align-items: center; position: relative; }
-    .win-value { font-size: 5vw; line-height: 1; }
-    .win-label { font-size: 1.6vw; color: #ffffff; font-weight: bold; letter-spacing: 1px; }
+    .win-value { font-size: 4.5vw; line-height: 1; }
+    .win-label { font-size: 1.4vw; color: #ffffff; font-weight: bold; letter-spacing: 1px; }
 
-    /* INDIKATOR SERVIS TERKUNCI POSISINYA DI ATAS BOX WIN */
+    /* INDIKATOR SERVIS TERKUNCI POSISINYA */
     .serve-icon {
       font-size: 1.8vw;
       position: absolute;
@@ -125,17 +125,17 @@
       display: none;
     }
 
-    /* SKOR UTAMA DIKUNCI KETAT UKURAN & CONTAINER-NYA AGAR TIDAK MENDORONG DUDUKAN APAPUN */
+    /* SKOR UTAMA TERKUNCI PRESISI (PROPORSI PRESISI TANPA GESER) */
     .score-container { 
       grid-row: 2; 
-      font-size: 21vw; 
+      font-size: 19.5vw; 
       line-height: 0.85; 
       text-align: center; 
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100%; /* Dikunci penuh di row 2 */
-      overflow: hidden; /* Mencegah pelebaran elemen saat angka berganti */
+      height: 100%;
+      overflow: hidden;
     }
     .score-team-a { grid-column: 1; }
     .score-team-b { grid-column: 3; }
