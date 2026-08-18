@@ -23,6 +23,7 @@
       text-transform: uppercase;
     }
 
+    /* MENETAPKAN UKURAN BARIS SECARA PRESISI AGAR NAMA TIM TIDAK MENDORONG BAGIAN TENGAH */
     .led-board {
       width: 96vw;
       height: 54vw;
@@ -33,7 +34,7 @@
       box-sizing: border-box;
       display: grid;
       grid-template-columns: 2.3fr 1.6fr 2.3fr;
-      grid-template-rows: auto 1fr;
+      grid-template-rows: 15vw 1fr; /* Mengunci tinggi baris nama tim pada 15vw agar bagian tengah tidak bergeser */
       gap: 1vw;
       position: relative;
       box-shadow: 0 0 50px rgba(0,0,0,0.9);
@@ -55,46 +56,49 @@
 
     /* Nama Tim */
     .team-info { 
-      line-height: 1.05; 
+      line-height: 1.0; 
       display: flex; 
       flex-direction: column; 
       align-items: center; 
-      justify-content: center; 
+      justify-content: flex-start; /* Mengunci teks dari atas agar saat bertambah baris, ia tumbuh ke bawah tanpa mengubah tinggi container */
       text-align: center;
+      height: 100%;
+      overflow: hidden;
     }
     .team-name { 
-      font-size: 6.5vw;
+      font-size: 5vw; /* Ukuran disesuaikan agar muat hingga 3 baris secara proporsional */
       font-weight: 700;
       letter-spacing: 2px;
       word-break: break-word;
       text-align: center;
-      min-height: 1.1em;
       width: 100%;
     }
 
-    /* Bagian Tengah */
+    /* Bagian Tengah Lock Posisi */
     .middle-stats { 
       grid-column: 2; 
+      grid-row: 1 / span 2; /* Menyatukan baris 1 dan 2 agar berdiri sendiri dan terkunci total dari pergerakan nama tim */
       display: flex; 
       flex-direction: column; 
       align-items: center; 
-      justify-content: flex-start; 
+      justify-content: center; 
       overflow: hidden; 
+      z-index: 2;
     }
     
     .league-logo-img {
-      max-width: 9.5vw;
-      max-height: 9.5vw;
+      max-width: 8vw;
+      max-height: 8vw;
       object-fit: contain;
       margin-bottom: 0.3vw;
       filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
     }
 
     .league-title {
-      font-size: 2.2vw;
+      font-size: 2vw;
       font-weight: 800;
       letter-spacing: 1.5px;
-      margin-bottom: 0.3vw;
+      margin-bottom: 0.5vw;
       text-align: center;
       line-height: 1.1;
       word-break: break-word;
@@ -103,26 +107,24 @@
       overflow: hidden;
     }
 
-    .set-container { display: flex; align-items: center; font-size: 2.2vw; font-weight: bold; margin-bottom: 0.2vw; }
+    .set-container { display: flex; align-items: center; font-size: 2vw; font-weight: bold; margin-bottom: 0.2vw; }
     .set-label { margin: 0 0.8vw; letter-spacing: 2px; }
-    .set-value { font-size: 6vw; line-height: 1; }
+    .set-value { font-size: 5.5vw; line-height: 1; }
 
-    .wins-container { display: flex; justify-content: space-between; width: 100%; align-items: center; margin-top: 0.3vw; }
+    .wins-container { display: flex; justify-content: space-around; width: 100%; align-items: center; margin-top: 0.5vw; position: relative; }
     .win-item { display: flex; flex-direction: column; align-items: center; position: relative; }
-    .win-value { font-size: 5vw; line-height: 1; }
-    .win-label { font-size: 1.6vw; color: #ffffff; font-weight: bold; letter-spacing: 1px; }
+    .win-value { font-size: 4.5vw; line-height: 1; }
+    .win-label { font-size: 1.4vw; color: #ffffff; font-weight: bold; letter-spacing: 1px; }
 
-    /* INDIKATOR SERVIS (BOLA / KOK) */
+    /* UNKUNCI POSISI IKON SERVIS AGAR FIXED TEPAT DI ATAS BOX WIN */
     .serve-icon {
-      font-size: 3vw;
+      font-size: 2.2vw;
       position: absolute;
-      top: -2vw;
+      top: -2.8vw; /* Terkunci presisi di atas kotak WIN */
+      left: 50%;
+      transform: translateX(-50%);
       display: none;
-      animation: pulse-glow 2s infinite alternate;
-    }
-    @keyframes pulse-glow {
-      0% { transform: scale(1); filter: drop-shadow(0 0 2px #ffcc00); }
-      100% { transform: scale(1.2); filter: drop-shadow(0 0 10px #ffcc00); }
+      z-index: 10;
     }
 
     /* Skor Utama */
@@ -157,7 +159,7 @@
       <div class="team-name led-red">TIM B</div>
     </div>
 
-    <!-- TENGAH -->
+    <!-- TENGAH (TERKUNCI PENUH DARI BARIS BARU NAMA TIM) -->
     <div class="middle-stats">
       <img id="league-logo" class="league-logo-img" src="" alt="" style="display: none;">
       
@@ -229,7 +231,6 @@
         if (data.teamA_name) document.querySelector('.score-team-a .team-name').innerHTML = data.teamA_name;
         if (data.teamB_name) document.querySelector('.score-team-b .team-name').innerHTML = data.teamB_name;
 
-        // TAMPILKAN LOGO
         const logoEl = document.getElementById('league-logo');
         if (data.league_logo && data.league_logo.trim() !== '') {
           logoEl.src = data.league_logo;
@@ -238,7 +239,6 @@
           logoEl.style.display = 'none';
         }
 
-        // LOGIKA INDIKATOR SERVIS (BOLA / KOK)
         const serveA = document.getElementById('serve-a');
         const serveB = document.getElementById('serve-b');
         if (data.service === 'teamA') {
@@ -251,9 +251,9 @@
           serveA.style.display = 'none';
           serveB.style.display = 'none';
         }
-
-        document.getElementById('boardContainer').style.opacity = '1';
       }
+
+      document.getElementById('boardContainer').style.opacity = '1';
     });
   </script>
 </body>
