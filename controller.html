@@ -3,18 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Remot Wasit - Skor Digital</title>
+  <title>Remot Wasit</title>
   <style>
     * { box-sizing: border-box; font-family: sans-serif; }
-    body { background: #121212; color: #fff; padding: 15px; }
-    h2 { text-align: center; color: #ffb700; margin-bottom: 15px; }
-    .card { background: #1e1e1e; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
-    label { font-size: 12px; color: #aaa; display: block; margin-top: 8px; }
-    input { width: 100%; padding: 10px; margin-top: 4px; background: #2a2a2a; border: 1px solid #444; color: #fff; border-radius: 5px; }
-    .btn { width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+    body { background: #121212; color: #fff; padding: 15px; margin: 0; }
+    
+    /* MINI SCOREBOARD UNTUK VISIBILITY WASIT */
+    .mini-scoreboard { background: #1e1e1e; border: 2px solid #333; border-radius: 10px; padding: 10px; text-align: center; margin-bottom: 15px; }
+    .mini-teams { display: flex; justify-content: space-between; font-weight: bold; font-size: 14px; margin-bottom: 5px; }
+    .mini-scores { display: flex; justify-content: space-between; font-size: 36px; font-weight: bold; }
+    .mini-score-a { color: #00f0ff; }
+    .mini-score-b { color: #00ff66; }
+    .mini-stats { font-size: 12px; color: #ffb700; margin-top: 5px; }
+
+    /* FORM & BUTTONS */
+    .card { background: #1e1e1e; padding: 12px; border-radius: 8px; margin-bottom: 12px; }
+    label { font-size: 12px; color: #aaa; display: block; margin-top: 5px; }
+    input, textarea { width: 100%; padding: 8px; margin-top: 3px; background: #2a2a2a; border: 1px solid #444; color: #fff; border-radius: 5px; }
+    textarea { height: 45px; resize: vertical; }
+    .btn { width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 8px; }
     .btn-gold { background: #ffb700; color: #000; }
-    .btn-blue { background: #00f0ff; color: #000; }
-    .btn-green { background: #00ff66; color: #000; }
+    .btn-blue { background: #00f0ff; color: #000; font-size: 18px; }
+    .btn-green { background: #00ff66; color: #000; font-size: 18px; }
     .btn-danger { background: #ff3333; color: #fff; }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   </style>
@@ -23,66 +33,76 @@
 </head>
 <body>
 
-  <h2>🎮 REMOT WASIT</h2>
+  <!-- MINI SCORE VISIBILITY WASIT -->
+  <div class="mini-scoreboard">
+    <div class="mini-teams">
+      <span id="miniNameA">TIM A</span>
+      <span id="miniNameB">TIM B</span>
+    </div>
+    <div class="mini-scores">
+      <span id="miniScoreA" class="mini-score-a">00</span>
+      <span id="miniScoreB" class="mini-score-b">00</span>
+    </div>
+    <div class="mini-stats">
+      SET: <span id="miniSet">1</span> | WIN A: <span id="miniWinA">0</span> - WIN B: <span id="miniWinB">0</span>
+    </div>
+  </div>
 
-  <!-- CARD 1: PENGATURAN LIGA & TIM -->
+  <!-- INPUT NAMA LIGA & LOGO -->
   <div class="card">
-    <h3>⚙️ Info Turnamen</h3>
     <label>Nama Liga / Turnamen:</label>
     <input type="text" id="inputLeagueName" placeholder="PHERMANA CUP 2026">
     
-    <label>URL Logo (Link Gambar PNG/JPG):</label>
-    <input type="text" id="inputLeagueLogo" placeholder="https://i.ibb.co/example/logo.png">
+    <label>URL Logo Turnamen (Link Image):</label>
+    <input type="text" id="inputLeagueLogo" placeholder="https://i.postimg.cc/xxx/logo.png">
     
-    <button class="btn btn-gold" onclick="saveTournamentInfo()">Simpan Info Turnamen</button>
+    <button class="btn btn-gold" onclick="updateTournament()">Update Turnamen & Logo</button>
   </div>
 
+  <!-- INPUT NAMA TIM (DENGAN TEXTAREA AGAR BISA ENTER / ATAS-BAWAH) -->
   <div class="card">
-    <h3>🛡️ Nama Tim</h3>
     <div class="grid-2">
       <div>
-        <label>Tim A (Kiri):</label>
-        <input type="text" id="inputTeamA" placeholder="TIM A">
+        <label>Nama Tim A (Gunakan Enter untuk 2 baris):</label>
+        <textarea id="inputTeamA" placeholder="TESTING&#10;TIM A"></textarea>
       </div>
       <div>
-        <label>Tim B (Kanan):</label>
-        <input type="text" id="inputTeamB" placeholder="TIM B">
+        <label>Nama Tim B (Gunakan Enter untuk 2 baris):</label>
+        <textarea id="inputTeamB" placeholder="TESTING&#10;TIM B"></textarea>
       </div>
     </div>
-    <button class="btn btn-gold" onclick="saveTeamNames()">Simpan Nama Tim</button>
+    <button class="btn btn-gold" onclick="updateTeams()">Update Nama Tim</button>
   </div>
 
-  <!-- CARD 2: KONTROL SKOR HASIL REALTIME -->
+  <!-- KONTROL SKOR WASIT -->
   <div class="card">
-    <h3>🏆 Kontrol Skor</h3>
     <div class="grid-2">
       <div>
-        <button class="btn btn-blue" onclick="changeScore('scoreA', 1)">+1 SKOR A</button>
-        <button class="btn btn-danger" onclick="changeScore('scoreA', -1)">-1 SKOR A</button>
+        <button class="btn btn-blue" onclick="changeScore('scoreA', 1)">+1 TIM A</button>
+        <button class="btn btn-danger" onclick="changeScore('scoreA', -1)">-1 TIM A</button>
       </div>
       <div>
-        <button class="btn btn-green" onclick="changeScore('scoreB', 1)">+1 SKOR B</button>
-        <button class="btn btn-danger" onclick="changeScore('scoreB', -1)">-1 SKOR B</button>
+        <button class="btn btn-green" onclick="changeScore('scoreB', 1)">+1 TIM B</button>
+        <button class="btn btn-danger" onclick="changeScore('scoreB', -1)">-1 TIM B</button>
       </div>
     </div>
   </div>
 
-  <!-- CARD 3: RESET -->
+  <!-- RESET -->
   <div class="card">
-    <button class="btn btn-danger" onclick="resetAll()">⚠️ RESET TOTAL SKOR</button>
+    <button class="btn btn-danger" onclick="resetScores()">RESET SKOR</button>
   </div>
 
   <script>
-    // ⚠️ Ganti Konfigurasi Firebase Anda di Sini (Samakan dengan index.html)
     const firebaseConfig = {
-  apiKey: "AIzaSyB_5Dbpy5XqNMXPTBljXK0gm4zyH-wkAiI",
-  authDomain: "papanscore.firebaseapp.com",
-  databaseURL: "https://papanscore-default-rtdb.firebaseio.com",
-  projectId: "papanscore",
-  storageBucket: "papanscore.firebasestorage.app",
-  messagingSenderId: "449160493063",
-  appId: "1:449160493063:web:364dedee3634cf9a18d2a2",
-  measurementId: "G-49GMLNNH3W"
+      apiKey: "AIzaSyB_5Dbpy5XqNMXPTBljXK0gm4zyH-wkAiI",
+      authDomain: "papanscore.firebaseapp.com",
+      databaseURL: "https://papanscore-default-rtdb.firebaseio.com",
+      projectId: "papanscore",
+      storageBucket: "papanscore.firebasestorage.app",
+      messagingSenderId: "449160493063",
+      appId: "1:449160493063:web:364dedee3634cf9a18d2a2",
+      measurementId: "G-49GMLNNH3W"
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
@@ -91,34 +111,44 @@
     const roomId = urlParams.get('room') || 'default';
     const roomRef = db.ref('rooms/' + roomId);
 
-    // Simpan Info Turnamen & Logo
-    function saveTournamentInfo() {
+    // Sync Data ke Mini Score Visibility Wasit (Tanpa Alert Pop-up)
+    roomRef.on('value', (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        document.getElementById('miniNameA').innerHTML = data.nameA || 'TIM A';
+        document.getElementById('miniNameB').innerHTML = data.nameB || 'TIM B';
+        document.getElementById('miniScoreA').innerText = String(data.scoreA || 0).padStart(2, '0');
+        document.getElementById('miniScoreB').innerText = String(data.scoreB || 0).padStart(2, '0');
+        document.getElementById('miniSet').innerText = data.set || 1;
+        document.getElementById('miniWinA').innerText = data.winA || 0;
+        document.getElementById('miniWinB').innerText = data.winB || 0;
+      }
+    });
+
+    // Update Turnamen & Logo (Tanpa Alert Pop-up)
+    function updateTournament() {
       const name = document.getElementById('inputLeagueName').value;
       const logo = document.getElementById('inputLeagueLogo').value;
       roomRef.update({ leagueName: name, leagueLogo: logo });
-      alert('Info Turnamen Terupdate!');
     }
 
-    // Simpan Nama Tim
-    function saveTeamNames() {
-      const a = document.getElementById('inputTeamA').value;
-      const b = document.getElementById('inputTeamB').value;
+    // Update Nama Tim (Mengubah tombol Enter / Newline menjadi <br>)
+    function updateTeams() {
+      let a = document.getElementById('inputTeamA').value.replace(/\n/g, '<br>');
+      let b = document.getElementById('inputTeamB').value.replace(/\n/g, '<br>');
       roomRef.update({ nameA: a, nameB: b });
-      alert('Nama Tim Terupdate!');
     }
 
-    // Tambah / Kurang Skor
+    // Tambah/Kurang Skor Real-time
     function changeScore(field, val) {
       roomRef.child(field).transaction((current) => {
         return Math.max(0, (current || 0) + val);
       });
     }
 
-    // Reset All
-    function resetAll() {
-      if(confirm("Yakin ingin reset skor menjadi 0?")) {
-        roomRef.update({ scoreA: 0, scoreB: 0, set: 1, winA: 0, winB: 0 });
-      }
+    // Reset Skor
+    function resetScores() {
+      roomRef.update({ scoreA: 0, scoreB: 0, set: 1, winA: 0, winB: 0 });
     }
   </script>
 </body>
