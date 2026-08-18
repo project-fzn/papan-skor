@@ -12,15 +12,14 @@
   <style>
     * { box-sizing: border-box; }
     
-    /* MENAMBAHKAN TRANSISI HALUS AGAR TIDAK BERKEDIP SAAT REFRESH */
     body { 
       font-family: sans-serif; 
       background-color: #121212; 
       color: #fff; 
       margin: 0; 
       padding: 12px; 
-      opacity: 0; /* Sembunyikan default saat memuat */
-      transition: opacity 0.2s ease-in-out; /* Tampil mulus setelah data siap */
+      opacity: 0;
+      transition: opacity 0.2s ease-in-out;
     }
 
     .mini-scoreboard {
@@ -44,6 +43,8 @@
     .mini-score-a { color: #00e5ff; }
     .mini-score-b { color: #00ff66; }
     
+    .mini-serve { font-size: 0.8rem; font-weight: bold; color: #ffcc00; margin-top: 2px; visibility: hidden; }
+
     .mini-center { display: flex; flex-direction: column; align-items: center; justify-content: center; }
     .mini-league { font-size: 0.75rem; color: #ffcc00; font-weight: bold; text-transform: uppercase; margin-bottom: 2px; line-height: 1.1; }
     .mini-set-label { font-size: 0.65rem; color: #aaa; font-weight: bold; }
@@ -80,6 +81,7 @@
     <div class="mini-team">
       <div id="disp-name-a" class="mini-team-name">TIM A</div>
       <div id="disp-score-a" class="mini-score mini-score-a">00</div>
+      <div id="disp-serve-a" class="mini-serve">🏸 SERVIS</div>
     </div>
 
     <div class="mini-center">
@@ -96,6 +98,7 @@
     <div class="mini-team">
       <div id="disp-name-b" class="mini-team-name">TIM B</div>
       <div id="disp-score-b" class="mini-score mini-score-b">00</div>
+      <div id="disp-serve-b" class="mini-serve">🏸 SERVIS</div>
     </div>
   </div>
 
@@ -105,7 +108,7 @@
     
     <div style="margin-bottom: 8px;">
       <div class="label-sm">NAMA LIGA / TURNAMEN (Enter untuk 2 baris)</div>
-      <textarea id="inputLeague" class="league-area" placeholder="Nama Liga"></textarea>
+      <textarea id="inputLeague" class="league-area" placeholder="Nama Liga">TURNAMEN VOLI&#10;EGA CUP 2026</textarea>
     </div>
 
     <div style="margin-bottom: 8px;">
@@ -206,16 +209,34 @@
         if (data.teamB_name) document.getElementById('disp-name-b').innerHTML = data.teamB_name;
         if (data.league_logo) document.getElementById('inputLogo').value = data.league_logo;
 
-        // TAMPILKAN REMOT HALUS TANPA KEDIP
+        // SYNC STATUS SERVIS DI MINI SCORE WASIT
+        const serveA = document.getElementById('disp-serve-a');
+        const serveB = document.getElementById('disp-serve-b');
+        if (data.service === 'teamA') {
+          serveA.style.visibility = 'visible';
+          serveB.style.visibility = 'hidden';
+        } else if (data.service === 'teamB') {
+          serveA.style.visibility = 'hidden';
+          serveB.style.visibility = 'visible';
+        } else {
+          serveA.style.visibility = 'hidden';
+          serveB.style.visibility = 'hidden';
+        }
+
         document.getElementById('controllerBody').style.opacity = '1';
       }
     });
 
+    // SETIAP TAMBAH POIN (+1), OTOMATIS BERPINDAH SERVIS KE TIM TERSEBUT
     window.updateScore = function(team, amount) {
       runTransaction(ref(db, `scoreboard/${roomId}/${team}_score`), (curr) => {
         let val = (parseInt(curr, 10) || 0) + amount;
         return val < 0 ? 0 : val;
       });
+
+      if (amount > 0) {
+        update(ref(db, `scoreboard/${roomId}`), { service: team });
+      }
     };
 
     window.updateWin = function(team, amount) {
@@ -247,13 +268,14 @@
     };
 
     window.resetAll = function() {
-      if (confirm("Reset semua skor dan set ke 0?")) {
+      if (confirm("Reset semua skor, set & servis?")) {
         update(ref(db, `scoreboard/${roomId}`), {
           teamA_score: 0, 
           teamB_score: 0,
           teamA_wins: 0, 
           teamB_wins: 0, 
-          set_value: 1
+          set_value: 1,
+          service: '' // Sembunyikan servis saat di-reset
         });
       }
     };
