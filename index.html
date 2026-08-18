@@ -23,18 +23,17 @@
       text-transform: uppercase;
     }
 
-    /* GRID KUNCI DENGAN PROPORSI HEIGHT YANG LEBIH TINGGI UNTUK BARIS ATAS */
     .led-board {
       width: 96vw;
       height: 54vw;
       border: 8px solid #222;
       border-radius: 12px;
       background-color: #050505;
-      padding: 2vw;
+      padding: 1.5vw;
       box-sizing: border-box;
       display: grid;
       grid-template-columns: 2.5fr 1.2fr 2.5fr;
-      grid-template-rows: 17vw 1fr; /* Diperluas dari 13vw ke 17vw agar 3 baris muat lega */
+      grid-template-rows: minmax(0, 1fr) auto; /* Menggunakan flexibel grid agar baris atas menyesuaikan tanpa memotong teks */
       gap: 1vw;
       position: relative;
       box-shadow: 0 0 50px rgba(0,0,0,0.9);
@@ -54,47 +53,52 @@
     .led-green { color: #00ff66; text-shadow: 0 0 25px rgba(0,255,102,0.8), 0 0 8px #00cc44; }
     .led-white { color: #ffffff; text-shadow: 0 0 10px #ffffff; }
 
-    /* NAMA TIM (UKURAN DIPERSEUAIKAN AGAR TIDAK TERPOTONG) */
+    /* NAMA TIM: BEBAS DARI MAKSIMAL TINGGI KETAT */
     .team-info { 
-      line-height: 0.95; 
+      line-height: 1.0; 
       display: flex; 
       flex-direction: column; 
       align-items: center; 
       justify-content: center; 
       text-align: center;
-      height: 17vw;
-      overflow: hidden;
+      width: 100%;
+      height: 100%;
     }
+    
     .team-name { 
-      font-size: clamp(2.5rem, 4.8vw, 6.5vw); /* Otomatis mengecil jika kalimat panjang / 3 baris */
+      font-size: 4vw; /* Disesuaikan agar aman untuk 1, 2, hingga 3 baris */
       font-weight: 700;
       letter-spacing: 1px;
       word-break: break-word;
       text-align: center;
       width: 100%;
+      max-height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
     }
 
-    /* Bagian Tengah (Liga, Set, Win) TERKUNCI TOTAL */
+    /* BAGIAN TENGAH TERKUNCI PERSIS */
     .middle-stats { 
       grid-column: 2; 
       display: flex; 
       flex-direction: column; 
       align-items: center; 
       justify-content: center; 
-      overflow: hidden; 
       height: 100%;
     }
     
     .league-logo-img {
-      max-width: 6.5vw;
-      max-height: 6.5vw;
+      max-width: 6vw;
+      max-height: 6vw;
       object-fit: contain;
       margin-bottom: 0.2vw;
       filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
     }
 
     .league-title {
-      font-size: 1.6vw;
+      font-size: 1.5vw;
       font-weight: 700;
       letter-spacing: 1px;
       margin-bottom: 0.3vw;
@@ -102,40 +106,37 @@
       line-height: 1.1;
       word-break: break-word;
       width: 100%;
-      max-height: 4em;
-      overflow: hidden;
     }
 
-    .set-container { display: flex; align-items: center; font-size: 2vw; font-weight: bold; margin-bottom: 0.2vw; }
+    .set-container { display: flex; align-items: center; font-size: 1.8vw; font-weight: bold; margin-bottom: 0.2vw; }
     .set-label { margin: 0 0.8vw; letter-spacing: 2px; }
-    .set-value { font-size: 5.5vw; line-height: 1; }
+    .set-value { font-size: 5vw; line-height: 1; }
 
-    .wins-container { display: flex; justify-content: space-between; width: 100%; align-items: center; margin-top: 0.3vw; position: relative; }
+    .wins-container { display: flex; justify-content: space-around; width: 100%; align-items: center; margin-top: 0.3vw; position: relative; }
     .win-item { display: flex; flex-direction: column; align-items: center; position: relative; }
-    .win-value { font-size: 4.5vw; line-height: 1; }
-    .win-label { font-size: 1.4vw; color: #ffffff; font-weight: bold; letter-spacing: 1px; }
+    .win-value { font-size: 4vw; line-height: 1; }
+    .win-label { font-size: 1.3vw; color: #ffffff; font-weight: bold; letter-spacing: 1px; }
 
-    /* INDIKATOR SERVIS TERKUNCI POSISINYA */
+    /* INDIKATOR SERVIS TERKUNCI DENGAN AMAN */
     .serve-icon {
-      font-size: 1.8vw;
+      font-size: 1.6vw;
       position: absolute;
-      top: -2.2vw;
+      top: -2vw;
       left: 50%;
       transform: translateX(-50%);
       display: none;
     }
 
-    /* SKOR UTAMA TERKUNCI PRESISI (PROPORSI PRESISI TANPA GESER) */
+    /* SKOR UTAMA PRESISI */
     .score-container { 
       grid-row: 2; 
-      font-size: 19.5vw; 
+      font-size: 18vw; 
       line-height: 0.85; 
       text-align: center; 
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100%;
-      overflow: hidden;
+      padding-bottom: 1vw;
     }
     .score-team-a { grid-column: 1; }
     .score-team-b { grid-column: 3; }
