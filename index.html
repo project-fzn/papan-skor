@@ -32,7 +32,7 @@
       padding: 2vw;
       box-sizing: border-box;
       display: grid;
-      grid-template-columns: 2.5fr 1.2fr 2.5fr;
+      grid-template-columns: 2.3fr 1.6fr 2.3fr; /* Lebar kolom tengah diperluas agar logo & liga muat sempurna */
       grid-template-rows: auto 1fr;
       gap: 1vw;
       position: relative;
@@ -51,33 +51,49 @@
     .led-green { color: #00ff66; text-shadow: 0 0 25px rgba(0,255,102,0.8), 0 0 8px #00cc44; }
     .led-white { color: #ffffff; text-shadow: 0 0 10px #ffffff; }
 
-    /* Nama Tim */
-    .team-info { line-height: 1.05; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    /* Nama Tim (Dibuat Center / Rata Tengah) */
+    .team-info { 
+      line-height: 1.05; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: center; 
+      text-align: center; /* Memastikan teks multiline rata tengah */
+    }
     .team-name { 
-      font-size: 7vw;
+      font-size: 6.5vw;
       font-weight: 700;
       letter-spacing: 2px;
       word-break: break-word;
-      align-items: center;
+      text-align: center; /* Rata tengah */
       min-height: 1.1em;
+      width: 100%;
     }
 
     /* Bagian Tengah (Logo, Liga, Set, Win) */
-    .middle-stats { grid-column: 2; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; overflow: hidden; }
+    .middle-stats { 
+      grid-column: 2; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: flex-start; 
+      overflow: hidden; 
+    }
     
-    /* STYLING LOGO BERWARNA */
+    /* UKURAN LOGO DIPERBESAR */
     .league-logo-img {
-      max-width: 6vw;
-      max-height: 6vw;
+      max-width: 9.5vw;  /* Diperbesar dari 6vw menjadi 9.5vw */
+      max-height: 9.5vw; /* Diperbesar agar jauh lebih jelas & mencolok */
       object-fit: contain;
-      margin-bottom: 0.2vw;
-      filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4));
+      margin-bottom: 0.3vw;
+      filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
     }
 
+    /* UKURAN NAMA LIGA DIPERBESAR & PROPORSIONAL */
     .league-title {
-      font-size: 1.8vw;
-      font-weight: 700;
-      letter-spacing: 1px;
+      font-size: 2.2vw;  /* Diperbesar dari 1.8vw menjadi 2.2vw */
+      font-weight: 800;
+      letter-spacing: 1.5px;
       margin-bottom: 0.3vw;
       text-align: center;
       line-height: 1.1;
@@ -199,7 +215,6 @@
         if (data.teamA_name) document.querySelector('.score-team-a .team-name').innerHTML = data.teamA_name;
         if (data.teamB_name) document.querySelector('.score-team-b .team-name').innerHTML = data.teamB_name;
 
-        // TAMPILKAN LOGO BERWARNA JIKA ADA LINK GAMBAR
         const logoEl = document.getElementById('league-logo');
         if (data.league_logo && data.league_logo.trim() !== '') {
           logoEl.src = data.league_logo;
