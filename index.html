@@ -4,40 +4,39 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Skor Digital - Display TV</title>
-  <!-- Menghubungkan ke file style.css bawaan Anda -->
   <link rel="stylesheet" href="style.css">
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
-<body>
+<!-- Tambahan style="opacity: 0;" agar tidak berkedip data lama saat refresh -->
+<body id="mainBody" style="opacity: 0; transition: opacity 0.2s ease-in-out;">
 
-  <!-- HEADER (Nama Tim & Logo/Liga) -->
+  <!-- HEADER -->
   <div class="scoreboard-header" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-    <div id="nameA" class="team-title">TIM A</div>
+    <div id="nameA" class="team-title"></div>
     
     <div class="center-header" style="display: flex; flex-direction: column; align-items: center;">
-      <!-- Logo Liga (Hanya Tampil Jika URL Diisi) -->
       <img id="leagueLogo" src="" alt="Logo Turnamen" style="display: none; width: 120px; height: 120px; object-fit: contain; margin-bottom: 5px;">
-      <div id="leagueName" class="league-name">PHERMANA CUP 2026</div>
+      <div id="leagueName" class="league-name"></div>
     </div>
     
-    <div id="nameB" class="team-title">TIM B</div>
+    <div id="nameB" class="team-title"></div>
   </div>
 
-  <!-- BODY SKOR (Menggunakan Struktur Asli Anda) -->
+  <!-- BODY SKOR -->
   <div class="scoreboard-body">
-    <div id="scoreA" class="score-box">00</div>
+    <div id="scoreA" class="score-box">--</div>
     
     <div class="center-stats">
       <div class="set-label">&lt; SET &gt;</div>
-      <div id="setValue" class="set-val">1</div>
+      <div id="setValue" class="set-val">-</div>
       <div class="win-container">
-        <div class="win-box"><span id="winA">0</span><br><small>WIN</small></div>
-        <div class="win-box"><span id="winB">0</span><br><small>WIN</small></div>
+        <div class="win-box"><span id="winA">-</span><br><small>WIN</small></div>
+        <div class="win-box"><span id="winB">-</span><br><small>WIN</small></div>
       </div>
     </div>
 
-    <div id="scoreB" class="score-box">00</div>
+    <div id="scoreB" class="score-box">--</div>
   </div>
 
   <div class="scoreboard-footer">
@@ -65,7 +64,6 @@
     db.ref('rooms/' + roomId).on('value', (snapshot) => {
       const data = snapshot.val();
       if (data) {
-        // Menggunakan innerHTML agar bisa membaca enter / tag <br> pada Nama Tim
         document.getElementById('nameA').innerHTML = data.nameA || 'TIM A';
         document.getElementById('nameB').innerHTML = data.nameB || 'TIM B';
         
@@ -79,7 +77,6 @@
           document.getElementById('leagueName').innerHTML = data.leagueName;
         }
 
-        // Tampilkan Logo Jika Ada Link Gambar Valid
         const logoImg = document.getElementById('leagueLogo');
         if (data.leagueLogo && data.leagueLogo.trim() !== "") {
           logoImg.src = data.leagueLogo;
@@ -87,6 +84,9 @@
         } else {
           logoImg.style.display = "none";
         }
+
+        // Tampilkan halaman secara mulus setelah data Firebase siap (menghilangkan kedipan)
+        document.getElementById('mainBody').style.opacity = '1';
       }
     });
   </script>
