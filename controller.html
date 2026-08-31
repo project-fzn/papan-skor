@@ -18,7 +18,7 @@
       color: #fff; 
       margin: 0; 
       padding: 12px; 
-      opacity: 0;
+      opacity: 1; /* Diubah ke 1 agar tidak blank saat menunggu data */
       transition: opacity 0.2s ease-in-out;
     }
 
@@ -222,9 +222,10 @@
           serveA.style.visibility = 'hidden';
           serveB.style.visibility = 'hidden';
         }
-
-        document.getElementById('controllerBody').style.opacity = '1';
       }
+      
+      // Dipastikan opacity selalu diubah ke 1 agar layar tidak tersangkut blank
+      document.getElementById('controllerBody').style.opacity = '1';
     });
 
     // SETIAP TAMBAH POIN (+1), OTOMATIS BERPINDAH SERVIS KE TIM TERSEBUT
