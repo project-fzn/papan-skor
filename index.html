@@ -33,7 +33,7 @@
       box-sizing: border-box;
       display: grid;
       grid-template-columns: 2.5fr 1.2fr 2.5fr;
-      grid-template-rows: minmax(0, 1fr) auto; /* Menggunakan flexibel grid agar baris atas menyesuaikan tanpa memotong teks */
+      grid-template-rows: 1fr 1.2fr; /* Baris 1: Nama & Liga (Atas), Baris 2: Skor & Stats (Bawah/Sejajar) */
       gap: 1vw;
       position: relative;
       box-shadow: 0 0 50px rgba(0,0,0,0.9);
@@ -53,7 +53,7 @@
     .led-green { color: #00ff66; text-shadow: 0 0 25px rgba(0,255,102,0.8), 0 0 8px #00cc44; }
     .led-white { color: #ffffff; text-shadow: 0 0 10px #ffffff; }
 
-    /* NAMA TIM: BEBAS DARI MAKSIMAL TINGGI KETAT */
+    /* BARIS ATAS: NAMA TIM (KIRI/KANAN) & LOGO/LIGA (TENGAH) */
     .team-info { 
       line-height: 1.0; 
       display: flex; 
@@ -63,10 +63,11 @@
       text-align: center;
       width: 100%;
       height: 100%;
+      grid-row: 1;
     }
     
     .team-name { 
-      font-size: 4vw; /* Disesuaikan agar aman untuk 1, 2, hingga 3 baris */
+      font-size: 3.8vw; 
       font-weight: 700;
       letter-spacing: 1px;
       word-break: break-word;
@@ -79,49 +80,60 @@
       align-items: center;
     }
 
-    /* BAGIAN TENGAH TERKUNCI PERSIS */
-    .middle-stats { 
-      grid-column: 2; 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      justify-content: center; 
+    .league-top-container {
+      grid-column: 2;
+      grid-row: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       height: 100%;
+      width: 100%;
     }
-    
+
     .league-logo-img {
-      max-width: 6vw;
-      max-height: 6vw;
+      max-width: 6.5vw;
+      max-height: 6.5vw;
       object-fit: contain;
-      margin-bottom: 0.2vw;
+      margin-bottom: 0.3vw;
       filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
     }
 
     .league-title {
-      font-size: 1.5vw;
+      font-size: 1.3vw;
       font-weight: 700;
       letter-spacing: 1px;
-      margin-bottom: 0.3vw;
       text-align: center;
       line-height: 1.1;
       word-break: break-word;
       width: 100%;
     }
 
-    .set-container { display: flex; align-items: center; font-size: 1.8vw; font-weight: bold; margin-bottom: 0.2vw; }
-    .set-label { margin: 0 0.8vw; letter-spacing: 2px; }
-    .set-value { font-size: 5vw; line-height: 1; }
+    /* BARIS BAWAH: SKOR UTAMA & SET/WIN TERKUNCI SEJAJAR HORISONTAL */
+    .middle-stats { 
+      grid-column: 2; 
+      grid-row: 2;
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: center; 
+      height: 100%;
+    }
 
-    .wins-container { display: flex; justify-content: space-around; width: 100%; align-items: center; margin-top: 0.3vw; position: relative; }
+    .set-container { display: flex; align-items: center; font-size: 1.4vw; font-weight: bold; margin-bottom: 0.1vw; }
+    .set-label { margin: 0 0.5vw; letter-spacing: 2px; }
+    .set-value { font-size: 4.2vw; line-height: 1; margin-bottom: 0.3vw; }
+
+    .wins-container { display: flex; justify-content: space-around; width: 100%; align-items: center; position: relative; }
     .win-item { display: flex; flex-direction: column; align-items: center; position: relative; }
-    .win-value { font-size: 4vw; line-height: 1; }
-    .win-label { font-size: 1.3vw; color: #ffffff; font-weight: bold; letter-spacing: 1px; }
+    .win-value { font-size: 3.2vw; line-height: 1; }
+    .win-label { font-size: 1.1vw; color: #ffffff; font-weight: bold; letter-spacing: 1px; }
 
-    /* INDIKATOR SERVIS TERKUNCI DENGAN AMAN */
+    /* INDIKATOR SERVIS */
     .serve-icon {
-      font-size: 1.6vw;
+      font-size: 1.5vw;
       position: absolute;
-      top: -2vw;
+      top: -1.8vw;
       left: 50%;
       transform: translateX(-50%);
       display: none;
@@ -136,7 +148,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      padding-bottom: 1vw;
+      padding-bottom: 0.5vw;
     }
     .score-team-a { grid-column: 1; }
     .score-team-b { grid-column: 3; }
@@ -150,22 +162,27 @@
 <body>
 
   <div id="boardContainer" class="led-board">
-    <!-- TIM A -->
+    <!-- TIM A (ATAS KIRI) -->
     <div class="team-info score-team-a">
       <div class="team-name led-red">TIM A</div>
     </div>
 
-    <!-- TIM B -->
+    <!-- LOGO & LIGA (ATAS TENGAH - KUNCI INDEPENDEN) -->
+    <div class="league-top-container">
+      <img id="league-logo" class="league-logo-img" src="" alt="" style="display: none;">
+      <div id="league-name" class="league-title led-yellow">INPUT NAMA LIGA DI SINI</div>
+    </div>
+
+    <!-- TIM B (ATAS KANAN) -->
     <div class="team-info score-team-b">
       <div class="team-name led-red">TIM B</div>
     </div>
 
-    <!-- TENGAH -->
-    <div class="middle-stats">
-      <img id="league-logo" class="league-logo-img" src="" alt="" style="display: none;">
-      
-      <div id="league-name" class="league-title led-yellow">INPUT NAMA LIGA DI SINI</div>
+    <!-- SKOR TIM A (BAWAH KIRI) -->
+    <div id="score-a" class="score-container score-team-a digital-font led-blue">00</div>
 
+    <!-- SET & WIN (BAWAH TENGAH - SEJAJAR DENGAN POIN) -->
+    <div class="middle-stats">
       <div class="set-container led-white">
         <span>&lt;</span><span class="set-label">SET</span><span>&gt;</span>
       </div>
@@ -185,8 +202,7 @@
       </div>
     </div>
 
-    <!-- SKOR UTAMA -->
-    <div id="score-a" class="score-container score-team-a digital-font led-blue">00</div>
+    <!-- SKOR TIM B (BAWAH KANAN) -->
     <div id="score-b" class="score-container score-team-b digital-font led-green">00</div>
 
     <div class="footer-label label-l led-white">L</div>
@@ -259,5 +275,3 @@
   </script>
 </body>
 </html>
-
-
