@@ -18,7 +18,7 @@
       color: #fff; 
       margin: 0; 
       padding: 12px; 
-      opacity: 1; /* Diubah ke 1 agar tidak blank saat menunggu data */
+      opacity: 1;
       transition: opacity 0.2s ease-in-out;
     }
 
@@ -102,7 +102,7 @@
     </div>
   </div>
 
-  <!-- INPUT NAMA LIGA DAN TIM -->
+  <!-- INPUT NAMA LIGA, LOGO, TEKS BERJALAN DAN TIM -->
   <div class="card card-full">
     <div class="card-title">Pengaturan Pertandingan</div>
     
@@ -114,6 +114,12 @@
     <div style="margin-bottom: 8px;">
       <div class="label-sm">URL LOGO TURNAMEN (Link Gambar PNG/JPG)</div>
       <input type="text" id="inputLogo" placeholder="https://link-gambar.com/logo.png">
+    </div>
+
+    <!-- KOLOM RUNNING TEXT -->
+    <div style="margin-bottom: 8px;">
+      <div class="label-sm">RUNNING TEXT (TEKS BERJALAN)</div>
+      <input type="text" id="inputRunningText" placeholder="Tulis pengumuman / running text di sini...">
     </div>
 
     <div class="label-sm">NAMA TIM (Enter untuk 2 baris)</div>
@@ -208,8 +214,8 @@
         if (data.teamA_name) document.getElementById('disp-name-a').innerHTML = data.teamA_name;
         if (data.teamB_name) document.getElementById('disp-name-b').innerHTML = data.teamB_name;
         if (data.league_logo) document.getElementById('inputLogo').value = data.league_logo;
+        if (data.running_text) document.getElementById('inputRunningText').value = data.running_text;
 
-        // SYNC STATUS SERVIS DI MINI SCORE WASIT
         const serveA = document.getElementById('disp-serve-a');
         const serveB = document.getElementById('disp-serve-b');
         if (data.service === 'teamA') {
@@ -224,11 +230,9 @@
         }
       }
       
-      // Dipastikan opacity selalu diubah ke 1 agar layar tidak tersangkut blank
       document.getElementById('controllerBody').style.opacity = '1';
     });
 
-    // SETIAP TAMBAH POIN (+1), OTOMATIS BERPINDAH SERVIS KE TIM TERSEBUT
     window.updateScore = function(team, amount) {
       runTransaction(ref(db, `scoreboard/${roomId}/${team}_score`), (curr) => {
         let val = (parseInt(curr, 10) || 0) + amount;
@@ -257,12 +261,14 @@
     window.saveMatchInfo = function() {
       const league = document.getElementById('inputLeague').value.replace(/\n/g, '<br>');
       const logo = document.getElementById('inputLogo').value.trim();
+      const rText = document.getElementById('inputRunningText').value.trim();
       const nameA = document.getElementById('inputTeamA').value.replace(/\n/g, '<br>');
       const nameB = document.getElementById('inputTeamB').value.replace(/\n/g, '<br>');
       
       update(ref(db, `scoreboard/${roomId}`), { 
         league_name: league,
         league_logo: logo,
+        running_text: rText,
         teamA_name: nameA, 
         teamB_name: nameB 
       });
@@ -276,7 +282,7 @@
           teamA_wins: 0, 
           teamB_wins: 0, 
           set_value: 1,
-          service: '' // Sembunyikan servis saat di-reset
+          service: ''
         });
       }
     };
