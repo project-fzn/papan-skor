@@ -29,12 +29,12 @@
       border: 8px solid #222;
       border-radius: 12px;
       background-color: #050505;
-      padding: 1.5vw;
+      padding: 1.5vw 1.5vw 0.5vw 1.5vw;
       box-sizing: border-box;
       display: grid;
       grid-template-columns: 2.5fr 1.2fr 2.5fr;
-      grid-template-rows: 1fr 1.2fr; /* Baris 1: Nama & Liga (Atas), Baris 2: Skor & Stats (Bawah/Sejajar) */
-      gap: 1vw;
+      grid-template-rows: 1fr 1.2fr auto; /* Baris 1: Nama, Baris 2: Skor, Baris 3: Running Text Bawah */
+      gap: 0.5vw 1vw;
       position: relative;
       box-shadow: 0 0 50px rgba(0,0,0,0.9);
       opacity: 0;
@@ -53,7 +53,7 @@
     .led-green { color: #00ff66; text-shadow: 0 0 25px rgba(0,255,102,0.8), 0 0 8px #00cc44; }
     .led-white { color: #ffffff; text-shadow: 0 0 10px #ffffff; }
 
-    /* BARIS ATAS: NAMA TIM (KIRI/KANAN) & LOGO/LIGA (TENGAH) */
+    /* BARIS ATAS: NAMA TIM & LOGO/LIGA */
     .team-info { 
       line-height: 1.0; 
       display: flex; 
@@ -92,15 +92,15 @@
     }
 
     .league-logo-img {
-      max-width: 13vw;
-      max-height: 13vw;
+      max-width: 11vw;
+      max-height: 11vw;
       object-fit: contain;
       margin-bottom: 0.3vw;
       filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
     }
 
     .league-title {
-      font-size: 2.2vw;
+      font-size: 1.8vw;
       font-weight: 700;
       letter-spacing: 1px;
       text-align: center;
@@ -109,7 +109,7 @@
       width: 100%;
     }
 
-    /* BARIS BAWAH: SKOR UTAMA & SET/WIN TERKUNCI SEJAJAR HORISONTAL */
+    /* BARIS TENGAH: SKOR UTAMA & SET/WIN */
     .middle-stats { 
       grid-column: 2; 
       grid-row: 2;
@@ -139,7 +139,7 @@
       display: none;
     }
 
-    /* SKOR UTAMA PRESISI */
+    /* SKOR UTAMA */
     .score-container { 
       grid-row: 2; 
       font-size: 18vw; 
@@ -153,10 +153,43 @@
     .score-team-a { grid-column: 1; }
     .score-team-b { grid-column: 3; }
 
+    /* BARIS BAWAH: RUNNING TEXT MEMBENTANG DI BOTTOM */
+    .ticker-wrap {
+      grid-column: span 3;
+      grid-row: 3;
+      width: 100%;
+      overflow: hidden;
+      background: #0d0d0d;
+      border-top: 2px solid #222;
+      padding: 0.4vw 0;
+      margin-top: 0.4vw;
+      display: flex;
+      align-items: center;
+      border-radius: 0 0 6px 6px;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+    }
+
+    .ticker-move {
+      display: inline-block;
+      white-space: nowrap;
+      padding-left: 100%;
+      animation: ticker 25s linear infinite;
+      font-size: 1.5vw;
+      font-weight: bold;
+      letter-spacing: 2px;
+      color: #ffcc00;
+      text-shadow: 0 0 10px rgba(255,204,0,0.8);
+    }
+
+    @keyframes ticker {
+      0% { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(-100%, 0, 0); }
+    }
+
     /* Footer L/R */
-    .footer-label { position: absolute; bottom: 1.5vw; font-size: 3.5vw; font-weight: bold; }
-    .label-l { left: 3vw; } 
-    .label-r { right: 3vw; }
+    .footer-label { position: absolute; bottom: 3vw; font-size: 3vw; font-weight: bold; }
+    .label-l { left: 2.5vw; } 
+    .label-r { right: 2.5vw; }
   </style>
 </head>
 <body>
@@ -167,7 +200,7 @@
       <div class="team-name led-red">TIM A</div>
     </div>
 
-    <!-- LOGO & LIGA (ATAS TENGAH - KUNCI INDEPENDEN) -->
+    <!-- LOGO & LIGA (ATAS TENGAH) -->
     <div class="league-top-container">
       <img id="league-logo" class="league-logo-img" src="" alt="" style="display: none;">
       <div id="league-name" class="league-title led-yellow">INPUT NAMA LIGA DI SINI</div>
@@ -178,10 +211,10 @@
       <div class="team-name led-red">TIM B</div>
     </div>
 
-    <!-- SKOR TIM A (BAWAH KIRI) -->
+    <!-- SKOR TIM A (TENGAH KIRI) -->
     <div id="score-a" class="score-container score-team-a digital-font led-blue">00</div>
 
-    <!-- SET & WIN (BAWAH TENGAH - SEJAJAR DENGAN POIN) -->
+    <!-- SET & WIN (TENGAH TENGAH) -->
     <div class="middle-stats">
       <div class="set-container led-white">
         <span>&lt;</span><span class="set-label">SET</span><span>&gt;</span>
@@ -202,8 +235,15 @@
       </div>
     </div>
 
-    <!-- SKOR TIM B (BAWAH KANAN) -->
+    <!-- SKOR TIM B (TENGAH KANAN) -->
     <div id="score-b" class="score-container score-team-b digital-font led-green">00</div>
+
+    <!-- RUNNING TEXT LED (PALING BAWAH) -->
+    <div class="ticker-wrap">
+      <div id="running-text" class="ticker-move">
+        SELAMAT DATANG DI TURNAMEN BULUTANGKIS DIGITAL - JUNJUNG TINGGI SPORTIVITAS!
+      </div>
+    </div>
 
     <div class="footer-label label-l led-white">L</div>
     <div class="footer-label label-r led-white">R</div>
@@ -247,6 +287,11 @@
         if (data.league_name) document.getElementById('league-name').innerHTML = data.league_name;
         if (data.teamA_name) document.querySelector('.score-team-a .team-name').innerHTML = data.teamA_name;
         if (data.teamB_name) document.querySelector('.score-team-b .team-name').innerHTML = data.teamB_name;
+
+        // RUNNING TEXT REALTIME
+        if (data.running_text) {
+          document.getElementById('running-text').innerText = data.running_text;
+        }
 
         const logoEl = document.getElementById('league-logo');
         if (data.league_logo && data.league_logo.trim() !== '') {
