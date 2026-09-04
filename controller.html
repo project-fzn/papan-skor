@@ -70,7 +70,8 @@
     .btn-add { background-color: #28a745; color: white; }
     .btn-sub { background-color: #dc3545; color: white; }
     .btn-main { background-color: #ffc107; color: black; font-weight: bold; width: 100%; padding: 10px; margin-top: 8px;}
-    .btn-reset { background-color: #6c757d; color: white; width: 100%; margin-top: 15px; padding: 12px; }
+    .btn-switch { background-color: #17a2b8; color: white; font-weight: bold; width: 100%; padding: 12px; margin-top: 10px; font-size: 1.1rem; }
+    .btn-reset { background-color: #6c757d; color: white; width: 100%; margin-top: 10px; padding: 12px; }
     .label-sm { font-size: 0.8rem; color: #aaa; text-align: center; margin-bottom: 4px; }
   </style>
 </head>
@@ -102,7 +103,7 @@
     </div>
   </div>
 
-  <!-- INPUT NAMA LIGA, LOGO, TEKS BERJALAN DAN TIM -->
+  <!-- INPUT NAMA LIGA, LOGO, RUNNING TEXT DAN TIM -->
   <div class="card card-full">
     <div class="card-title">Pengaturan Pertandingan</div>
     
@@ -116,7 +117,6 @@
       <input type="text" id="inputLogo" placeholder="https://link-gambar.com/logo.png">
     </div>
 
-    <!-- KOLOM RUNNING TEXT -->
     <div style="margin-bottom: 8px;">
       <div class="label-sm">RUNNING TEXT (TEKS BERJALAN)</div>
       <input type="text" id="inputRunningText" placeholder="Tulis pengumuman / running text di sini...">
@@ -173,11 +173,14 @@
     </div>
   </div>
 
+  <!-- TOMBOL SWITCH POSISI / TUKAR LAPANGAN -->
+  <button class="btn-switch" onclick="switchCourt()">🔀 Switch Tempat (Tukar Tim A & B)</button>
+
   <button class="btn-reset" onclick="resetAll()">🔄 Reset Semua Skor & Set</button>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, runTransaction, update, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, runTransaction, update, onValue, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyB_5DbpY5XqNMXPTBljXK0gm4zyH-wkAiI",
@@ -211,8 +214,14 @@
         document.getElementById('disp-win-b').innerText = data.teamB_wins ?? 0;
         
         if (data.league_name) document.getElementById('disp-league').innerHTML = data.league_name;
-        if (data.teamA_name) document.getElementById('disp-name-a').innerHTML = data.teamA_name;
-        if (data.teamB_name) document.getElementById('disp-name-b').innerHTML = data.teamB_name;
+        if (data.teamA_name) {
+          document.getElementById('disp-name-a').innerHTML = data.teamA_name;
+          document.getElementById('inputTeamA').value = data.teamA_name.replace(/<br>/g, '\n');
+        }
+        if (data.teamB_name) {
+          document.getElementById('disp-name-b').innerHTML = data.teamB_name;
+          document.getElementById('inputTeamB').value = data.teamB_name.replace(/<br>/g, '\n');
+        }
         if (data.league_logo) document.getElementById('inputLogo').value = data.league_logo;
         if (data.running_text) document.getElementById('inputRunningText').value = data.running_text;
 
@@ -271,6 +280,29 @@
         running_text: rText,
         teamA_name: nameA, 
         teamB_name: nameB 
+      });
+    };
+
+    // FUNGSI TUKAR TEMPAT / SWITCH COURT (NAMA, SKOR, WIN & SERVIS BERPINDAH INSTAN)
+    window.switchCourt = function() {
+      const roomRef = ref(db, `scoreboard/${roomId}`);
+      get(roomRef).then((snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          let newService = '';
+          if (data.service === 'teamA') newService = 'teamB';
+          else if (data.service === 'teamB') newService = 'teamA';
+
+          update(roomRef, {
+            teamA_name: data.teamB_name || '',
+            teamB_name: data.teamA_name || '',
+            teamA_score: data.teamB_score || 0,
+            teamB_score: data.teamA_score || 0,
+            teamA_wins: data.teamB_wins || 0,
+            teamB_wins: data.teamA_wins || 0,
+            service: newService
+          });
+        }
       });
     };
 
