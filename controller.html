@@ -22,6 +22,31 @@
       transition: opacity 0.2s ease-in-out;
     }
 
+    /* PENGATURAN SUDUT PANDANG (VIEWPORT MODE) */
+    .view-mode-bar {
+      display: flex;
+      background: #222;
+      border-radius: 8px;
+      padding: 4px;
+      margin-bottom: 12px;
+      border: 1px solid #444;
+    }
+    .view-btn {
+      flex: 1;
+      padding: 8px;
+      font-size: 0.85rem;
+      border-radius: 6px;
+      background: transparent;
+      color: #888;
+      border: none;
+      cursor: pointer;
+    }
+    .view-btn.active {
+      background: #00e5ff;
+      color: #000;
+      font-weight: bold;
+    }
+
     .mini-scoreboard {
       background-color: #080808;
       border: 2px solid #333;
@@ -37,6 +62,14 @@
       top: 0;
       z-index: 99;
     }
+
+    /* KELAS MIRROR UNTUK MEMBALIK TAMPILAN VISUAL DI HP */
+    .mirror-mode .mini-scoreboard {
+      grid-template-columns: 2fr 1fr 2fr;
+    }
+    .mirror-mode .mini-team-a { grid-column: 3; }
+    .mirror-mode .mini-team-b { grid-column: 1; }
+
     .mini-team { display: flex; flex-direction: column; }
     .mini-team-name { font-size: 0.9rem; font-weight: bold; color: #ff3333; text-transform: uppercase; line-height: 1.1; height: 2.2em; overflow: hidden; }
     .mini-score { font-family: 'Orbitron', monospace; font-size: 3rem; font-weight: 900; line-height: 1; margin-top: 5px; }
@@ -45,13 +78,18 @@
     
     .mini-serve { font-size: 0.8rem; font-weight: bold; color: #ffcc00; margin-top: 2px; visibility: hidden; }
 
-    .mini-center { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .mini-center { display: flex; flex-direction: column; align-items: center; justify-content: center; grid-column: 2; }
     .mini-league { font-size: 0.75rem; color: #ffcc00; font-weight: bold; text-transform: uppercase; margin-bottom: 2px; line-height: 1.1; }
     .mini-set-label { font-size: 0.65rem; color: #aaa; font-weight: bold; }
     .mini-set-val { font-family: 'Orbitron', monospace; font-size: 1.5rem; color: #ffcc00; font-weight: 900; line-height: 1; }
     .mini-wins { display: flex; gap: 8px; font-size: 0.75rem; font-weight: bold; color: #ffcc00; margin-top: 2px; }
 
     .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    
+    /* MIRROR UNTUK KONTROL KARTU TOMBOL */
+    .mirror-mode .card-team-a { grid-column: 2; }
+    .mirror-mode .card-team-b { grid-column: 1; }
+
     .card { background: #1e1e1e; border-radius: 12px; padding: 12px; border: 1px solid #333; }
     .card-full { grid-column: span 2; }
     .card-title { font-size: 1rem; font-weight: bold; margin-bottom: 8px; text-align: center; border-bottom: 1px solid #333; padding-bottom: 4px; }
@@ -77,9 +115,15 @@
 </head>
 <body id="controllerBody">
 
+  <!-- TOGGLE VIEWPORT (SUDUT PANDANG WASIT) -->
+  <div class="view-mode-bar">
+    <button id="btnViewNormal" class="view-btn active" onclick="setViewMode('normal')">📺 Sisi TV (Normal)</button>
+    <button id="btnViewMirror" class="view-btn" onclick="setViewMode('mirror')">🔄 Sisi Lapangan (Mirror)</button>
+  </div>
+
   <!-- SCOREBOARD MINI WASIT -->
   <div class="mini-scoreboard">
-    <div class="mini-team">
+    <div class="mini-team mini-team-a">
       <div id="disp-name-a" class="mini-team-name">TIM A</div>
       <div id="disp-score-a" class="mini-score mini-score-a">00</div>
       <div id="disp-serve-a" class="mini-serve">🏸 SERVIS</div>
@@ -96,7 +140,7 @@
       </div>
     </div>
 
-    <div class="mini-team">
+    <div class="mini-team mini-team-b">
       <div id="disp-name-b" class="mini-team-name">TIM B</div>
       <div id="disp-score-b" class="mini-score mini-score-b">00</div>
       <div id="disp-serve-b" class="mini-serve">🏸 SERVIS</div>
@@ -132,7 +176,7 @@
 
   <div class="grid-container" style="margin-top: 12px;">
     <!-- TIM A -->
-    <div class="card">
+    <div class="card card-team-a">
       <div class="card-title team-a-title">SKOR A</div>
       <div class="btn-group">
         <button class="btn-add" onclick="updateScore('teamA', 1)">+1</button>
@@ -148,7 +192,7 @@
     </div>
 
     <!-- TIM B -->
-    <div class="card">
+    <div class="card card-team-b">
       <div class="card-title team-b-title">SKOR B</div>
       <div class="btn-group">
         <button class="btn-add" onclick="updateScore('teamB', 1)">+1</button>
@@ -197,6 +241,23 @@
 
     const urlParams = new URLSearchParams(window.location.search);
     const roomId = urlParams.get('room') || 'demo';
+
+    // MEMASANG UTILITY SUDUT PANDANG (SISI TV VS SISI LAPANGAN)
+    window.setViewMode = function(mode) {
+      const body = document.body;
+      const btnNormal = document.getElementById('btnViewNormal');
+      const btnMirror = document.getElementById('btnViewMirror');
+
+      if (mode === 'mirror') {
+        body.classList.add('mirror-mode');
+        btnNormal.classList.remove('active');
+        btnMirror.classList.add('active');
+      } else {
+        body.classList.remove('mirror-mode');
+        btnNormal.classList.add('active');
+        btnMirror.classList.remove('active');
+      }
+    };
 
     const formatScore = (val) => {
       if (val === undefined || val === null) return '00';
@@ -283,7 +344,6 @@
       });
     };
 
-    // FUNGSI TUKAR TEMPAT / SWITCH COURT (NAMA, SKOR, WIN & SERVIS BERPINDAH INSTAN)
     window.switchCourt = function() {
       const roomRef = ref(db, `scoreboard/${roomId}`);
       get(roomRef).then((snapshot) => {
