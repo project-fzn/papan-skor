@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Akses Papan Skor Digital Anda</title>
+  <style>
+    body { font-family: sans-serif; background: #121212; color: white; padding: 20px; text-align: center; }
+    .card { background: #1e1e1e; padding: 20px; border-radius: 12px; max-width: 400px; margin: auto; border: 1px solid #333; }
+    input { width: 90%; padding: 10px; margin: 10px 0; border-radius: 6px; border: 1px solid #444; background: #2b2b2b; color: white; text-align: center; font-weight: bold; }
+    button { width: 95%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+    .result { margin-top: 20px; display: none; text-align: left; background: #000; padding: 15px; border-radius: 8px; font-size: 0.9rem; }
+    .link-btn { display: block; padding: 10px; background: #00e5ff; color: black; text-decoration: none; font-weight: bold; text-align: center; border-radius: 6px; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>🎉 Pembayaran Berhasil!</h2>
+    <p>Masukkan Nama Room/GOR yang ingin Anda gunakan:</p>
+    
+    <input type="text" id="roomInput" placeholder="Contoh: gor-cahaya" />
+    <button onclick="generateLinks()">Buat Link Akses</button>
+
+    <div id="resultBox" class="result">
+      <p><b>Link Display (Untuk TV/Monitor):</b></p>
+      <a id="linkTv" class="link-btn" href="#" target="_blank">Buka Display TV</a>
+      
+      <p style="margin-top: 15px;"><b>Link Controller (Untuk HP Wasit):</b></p>
+      <a id="linkHp" class="link-btn" style="background: #ffcc00;" href="#" target="_blank">Buka Remot Wasit</a>
+    </div>
+  </div>
+
+  <script>
+    function generateLinks() {
+      const room = document.getElementById('roomInput').value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-');
+      if (!room) return alert('Silakan isi nama room terlebih dahulu!');
+
+      const urlTv = `https://skordigital.my.id/?room=${room}`;
+      const urlHp = `https://skordigital.my.id/controller.html?room=${room}`;
+
+      document.getElementById('linkTv').href = urlTv;
+      document.getElementById('linkTv').innerText = urlTv;
+      
+      document.getElementById('linkHp').href = urlHp;
+      document.getElementById('linkHp').innerText = urlHp;
+
+      document.getElementById('resultBox').style.display = 'block';
+    }
+  </script>
+</body>
+</html>
