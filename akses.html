@@ -11,35 +11,34 @@
     h2 { color: #00e5ff; margin-top: 0; font-size: 1.5rem; }
     p { color: #aaa; font-size: 0.88rem; line-height: 1.4; }
     label { font-size: 0.8rem; color: #888; text-align: left; display: block; margin-top: 10px; font-weight: 600; }
-    input { width: 100%; padding: 12px; margin: 6px 0 10px 0; border-radius: 6px; border: 1px solid #444; background: #2b2b2b; color: white; text-align: center; font-weight: bold; font-size: 0.95rem; }
+    .input-wrapper { display: flex; gap: 6px; margin: 6px 0 10px 0; }
+    input { width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #444; background: #2b2b2b; color: white; text-align: center; font-weight: bold; font-size: 0.9rem; }
     input:focus { border-color: #00e5ff; outline: none; }
-    button { width: 100%; padding: 14px; background: #28a745; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 12px; transition: 0.2s; }
-    button:hover { background: #218838; }
-    button:active { transform: scale(0.98); }
+    .btn-paste { background: #334155; color: #00e5ff; border: 1px solid #00e5ff; border-radius: 6px; padding: 0 12px; font-size: 0.8rem; font-weight: bold; cursor: pointer; white-space: nowrap; }
+    button.btn-submit { width: 100%; padding: 14px; background: #28a745; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 12px; transition: 0.2s; }
+    button.btn-submit:hover { background: #218838; }
     
     .result { margin-top: 20px; display: none; text-align: left; background: #000; padding: 15px; border-radius: 8px; border: 1px solid #00ff66; }
     .link-btn { display: block; padding: 10px; background: #00e5ff; color: black; text-decoration: none; font-weight: bold; text-align: center; border-radius: 6px; margin-top: 6px; font-size: 0.85rem; word-break: break-all; }
-    
-    .btn-wa { background: #25d366; color: white; margin-top: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; padding: 12px; border-radius: 6px; font-weight: bold; font-size: 0.9rem; transition: 0.2s; }
-    .btn-wa:hover { background: #1ebd56; }
-    
-    .badge-auto { background: #1b3320; border: 1px solid #00ff66; color: #00ff66; font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; display: inline-block; margin-bottom: 8px; }
+    .btn-wa { background: #25d366; color: white; margin-top: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; padding: 12px; border-radius: 6px; font-weight: bold; font-size: 0.9rem; }
   </style>
 </head>
 <body>
 
   <div class="card">
     <h2>🎉 Aktivasi Papan Skor</h2>
-    <div id="statusBadge" style="display:none;" class="badge-auto">✅ REF ID Terverifikasi Otomatis</div>
-    <p>Tentukan <b>Nama Room / GOR</b> Anda untuk mengaktifkan papan skor:</p>
+    <p>Salin <b>REF ID</b> dari resi email Lynk.id Anda, lalu tempelkan di bawah ini:</p>
     
-    <label>REF ID Transaksi (Otomatis):</label>
-    <input type="text" id="licenseInput" placeholder="Membaca REF ID..." />
+    <label>REF ID Transaksi:</label>
+    <div class="input-wrapper">
+      <input type="text" id="licenseInput" placeholder="Contoh: 8956ce6e..." />
+      <button class="btn-paste" onclick="pasteRef()">📋 Tempel</button>
+    </div>
 
     <label>Nama Room / GOR yang Diinginkan:</label>
     <input type="text" id="roomInput" placeholder="Contoh: gor-jawara" />
     
-    <button onclick="activateRoom()">Aktifkan & Buat Link Akses</button>
+    <button class="btn-submit" onclick="activateRoom()">Aktifkan & Buat Link Akses</button>
 
     <div id="resultBox" class="result">
       <p style="color:#00ff66; font-weight:bold; margin-top:0;">✅ Room Berhasil Diaktifkan!</p>
@@ -50,7 +49,6 @@
       <p style="margin-bottom:4px; margin-top:12px; font-size:0.8rem; color:#aaa;">Link Controller (Buka di HP Wasit):</p>
       <a id="linkHp" class="link-btn" style="background: #ffcc00;" href="#" target="_blank">Buka Remot Wasit</a>
 
-      <!-- Tombol Kirim Rekap ke WA Buyer -->
       <a id="waBtn" class="btn-wa" href="#" target="_blank">
         📲 Simpan & Kirim Rekap Link ke WA Saya
       </a>
@@ -74,29 +72,26 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // BACA REF ID DARI URL SECARA OTOMATIS
-    const urlParams = new URLSearchParams(window.location.search);
-    const autoRefId = urlParams.get('ref');
-
-    const licenseInput = document.getElementById('licenseInput');
-
-    if (autoRefId) {
-      licenseInput.value = autoRefId;
-      licenseInput.readOnly = true; // Kunci kolom agar buyer tidak perlu / tidak bisa ubah
-      licenseInput.style.backgroundColor = "#1b3320";
-      licenseInput.style.borderColor = "#00ff66";
-      document.getElementById('statusBadge').style.display = 'inline-block';
-    }
+    // Fungsi Tempel Otomatis dari Clipboard
+    window.pasteRef = async function() {
+      try {
+        const text = await navigator.clipboard.readText();
+        if (text) {
+          document.getElementById('licenseInput').value = text.trim();
+        }
+      } catch (err) {
+        alert('Gagal membaca clipboard. Silakan paste manual dengan tahan lama di kolom input.');
+      }
+    };
 
     window.activateRoom = function() {
-      const license = licenseInput.value.trim();
+      const license = document.getElementById('licenseInput').value.trim();
       const roomRaw = document.getElementById('roomInput').value.trim();
 
-      // Check format validasi REF ID
       const isValidLynkRef = /^[a-f0-9]{15,}$/i.test(license);
 
       if (!isValidLynkRef) {
-        return alert('❌ REF ID tidak valid / tidak ditemukan dari URL! Silakan buka kembali link dari email Lynk.id.');
+        return alert('❌ REF ID tidak valid! Salin REF ID resmi sepanjang 32 karakter dari resi email Lynk.id Anda.');
       }
 
       if (!roomRaw) {
@@ -105,7 +100,6 @@
 
       const room = roomRaw.toLowerCase().replace(/[^a-z0-9-]/g, '-');
 
-      // Check ke Firebase
       const licenseRef = ref(db, `used_licenses/${license}`);
       
       get(licenseRef).then((snapshot) => {
@@ -124,7 +118,6 @@
           document.getElementById('linkHp').href = urlHp;
           document.getElementById('linkHp').innerText = urlHp;
 
-          // Rangkai Teks WhatsApp
           const waMessage = encodeURIComponent(
             `🏆 *LINK AKSES PAPAN SKOR DIGITAL*\n\n` +
             `Nama Room: *${room}*\n` +
