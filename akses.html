@@ -22,16 +22,19 @@
     
     .btn-wa { background: #25d366; color: white; margin-top: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; padding: 12px; border-radius: 6px; font-weight: bold; font-size: 0.9rem; transition: 0.2s; }
     .btn-wa:hover { background: #1ebd56; }
+    
+    .badge-auto { background: #1b3320; border: 1px solid #00ff66; color: #00ff66; font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; display: inline-block; margin-bottom: 8px; }
   </style>
 </head>
 <body>
 
   <div class="card">
     <h2>🎉 Aktivasi Papan Skor</h2>
-    <p>Masukkan <b>REF ID</b> dari resi Lynk.id dan buat <b>Nama Room</b> Anda:</p>
+    <div id="statusBadge" style="display:none;" class="badge-auto">✅ REF ID Terverifikasi Otomatis</div>
+    <p>Tentukan <b>Nama Room / GOR</b> Anda untuk mengaktifkan papan skor:</p>
     
-    <label>REF ID Transaksi (dari Resi / Email Lynk.id):</label>
-    <input type="text" id="licenseInput" placeholder="Contoh: 8956ce6e6e9a1541cad6a68babbf1151" />
+    <label>REF ID Transaksi (Otomatis):</label>
+    <input type="text" id="licenseInput" placeholder="Membaca REF ID..." />
 
     <label>Nama Room / GOR yang Diinginkan:</label>
     <input type="text" id="roomInput" placeholder="Contoh: gor-jawara" />
@@ -47,7 +50,7 @@
       <p style="margin-bottom:4px; margin-top:12px; font-size:0.8rem; color:#aaa;">Link Controller (Buka di HP Wasit):</p>
       <a id="linkHp" class="link-btn" style="background: #ffcc00;" href="#" target="_blank">Buka Remot Wasit</a>
 
-      <!-- Tombol Kirim / Simpan ke WhatsApp Buyer -->
+      <!-- Tombol Kirim Rekap ke WA Buyer -->
       <a id="waBtn" class="btn-wa" href="#" target="_blank">
         📲 Simpan & Kirim Rekap Link ke WA Saya
       </a>
@@ -71,27 +74,29 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // Otomatis baca REF ID jika dikirim via URL parameter
+    // BACA REF ID DARI URL SECARA OTOMATIS
     const urlParams = new URLSearchParams(window.location.search);
     const autoRefId = urlParams.get('ref');
 
+    const licenseInput = document.getElementById('licenseInput');
+
     if (autoRefId) {
-      const licenseInput = document.getElementById('licenseInput');
       licenseInput.value = autoRefId;
-      licenseInput.readOnly = true;
+      licenseInput.readOnly = true; // Kunci kolom agar buyer tidak perlu / tidak bisa ubah
       licenseInput.style.backgroundColor = "#1b3320";
       licenseInput.style.borderColor = "#00ff66";
+      document.getElementById('statusBadge').style.display = 'inline-block';
     }
 
     window.activateRoom = function() {
-      const license = document.getElementById('licenseInput').value.trim();
+      const license = licenseInput.value.trim();
       const roomRaw = document.getElementById('roomInput').value.trim();
 
-      // Validasi format REF ID bawaan Lynk.id (Minimal 20 karakter hex)
-      const isValidLynkRef = /^[a-f0-9]{20,}$/i.test(license);
+      // Check format validasi REF ID
+      const isValidLynkRef = /^[a-f0-9]{15,}$/i.test(license);
 
       if (!isValidLynkRef) {
-        return alert('❌ REF ID tidak valid! Pastikan Anda memasukkan REF ID resmi dari resi pembayaran Lynk.id.');
+        return alert('❌ REF ID tidak valid / tidak ditemukan dari URL! Silakan buka kembali link dari email Lynk.id.');
       }
 
       if (!roomRaw) {
@@ -100,14 +105,13 @@
 
       const room = roomRaw.toLowerCase().replace(/[^a-z0-9-]/g, '-');
 
-      // 1. Cek apakah REF ID ini sudah pernah digunakan untuk room lain
+      // Check ke Firebase
       const licenseRef = ref(db, `used_licenses/${license}`);
       
       get(licenseRef).then((snapshot) => {
         if (snapshot.exists() && snapshot.val() !== room) {
           alert(`❌ GAGAL: REF ID transaksi ini sudah digunakan untuk mengaktifkan room "${snapshot.val()}". 1 Pembayaran hanya berlaku untuk 1 Room!`);
         } else {
-          // 2. Simpan room ke daftar diizinkan & kunci REF ID
           set(ref(db, `allowed_rooms/${room}`), true);
           set(ref(db, `used_licenses/${license}`), room);
 
@@ -120,7 +124,7 @@
           document.getElementById('linkHp').href = urlHp;
           document.getElementById('linkHp').innerText = urlHp;
 
-          // Rangkai teks rekap untuk WhatsApp
+          // Rangkai Teks WhatsApp
           const waMessage = encodeURIComponent(
             `🏆 *LINK AKSES PAPAN SKOR DIGITAL*\n\n` +
             `Nama Room: *${room}*\n` +
