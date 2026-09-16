@@ -6,27 +6,37 @@
   <title>Aktivasi Papan Skor Digital</title>
   <style>
     * { box-sizing: border-box; }
-    body { font-family: sans-serif; background: #0d0d0d; color: white; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-    .card { background: #1a1a1a; padding: 25px; border-radius: 12px; max-width: 420px; width: 100%; border: 1px solid #333; box-shadow: 0 8px 24px rgba(0,0,0,0.5); text-align: center; }
-    h2 { color: #00e5ff; margin-top: 0; }
-    p { color: #aaa; font-size: 0.9rem; line-height: 1.4; }
-    input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 6px; border: 1px solid #444; background: #2b2b2b; color: white; text-align: center; font-weight: bold; font-size: 1rem; }
-    button { width: 100%; padding: 14px; background: #28a745; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 10px; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0d0d0d; color: white; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+    .card { background: #1a1a1a; padding: 25px; border-radius: 12px; max-width: 440px; width: 100%; border: 1px solid #333; box-shadow: 0 8px 24px rgba(0,0,0,0.5); text-align: center; }
+    h2 { color: #00e5ff; margin-top: 0; font-size: 1.5rem; }
+    p { color: #aaa; font-size: 0.88rem; line-height: 1.4; }
+    label { font-size: 0.8rem; color: #888; text-align: left; display: block; margin-top: 10px; font-weight: 600; }
+    input { width: 100%; padding: 12px; margin: 6px 0 10px 0; border-radius: 6px; border: 1px solid #444; background: #2b2b2b; color: white; text-align: center; font-weight: bold; font-size: 0.95rem; }
+    input:focus { border-color: #00e5ff; outline: none; }
+    button { width: 100%; padding: 14px; background: #28a745; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 12px; transition: 0.2s; }
+    button:hover { background: #218838; }
     button:active { transform: scale(0.98); }
+    
     .result { margin-top: 20px; display: none; text-align: left; background: #000; padding: 15px; border-radius: 8px; border: 1px solid #00ff66; }
-    .link-btn { display: block; padding: 10px; background: #00e5ff; color: black; text-decoration: none; font-weight: bold; text-align: center; border-radius: 6px; margin-top: 6px; font-size: 0.9rem; word-break: break-all; }
+    .link-btn { display: block; padding: 10px; background: #00e5ff; color: black; text-decoration: none; font-weight: bold; text-align: center; border-radius: 6px; margin-top: 6px; font-size: 0.85rem; word-break: break-all; }
+    
+    .btn-wa { background: #25d366; color: white; margin-top: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; padding: 12px; border-radius: 6px; font-weight: bold; font-size: 0.9rem; transition: 0.2s; }
+    .btn-wa:hover { background: #1ebd56; }
   </style>
 </head>
 <body>
 
   <div class="card">
     <h2>🎉 Aktivasi Papan Skor</h2>
-    <p>Masukkan <b>Kode Lisensi</b> yang ada di catatan Lynk.id dan buat <b>Nama Room</b> Anda:</p>
+    <p>Masukkan <b>REF ID</b> dari resi Lynk.id dan buat <b>Nama Room</b> Anda:</p>
     
-    <input type="text" id="licenseInput" placeholder="Masukkan Kode Lisensi (dari Lynk.id)" />
-    <input type="text" id="roomInput" placeholder="Contoh Nama Room: gor-jawara" />
+    <label>REF ID Transaksi (dari Resi / Email Lynk.id):</label>
+    <input type="text" id="licenseInput" placeholder="Contoh: 8956ce6e6e9a1541cad6a68babbf1151" />
+
+    <label>Nama Room / GOR yang Diinginkan:</label>
+    <input type="text" id="roomInput" placeholder="Contoh: gor-jawara" />
     
-    <button onclick="activateRoom()">Aktifkan & Buat Link</button>
+    <button onclick="activateRoom()">Aktifkan & Buat Link Akses</button>
 
     <div id="resultBox" class="result">
       <p style="color:#00ff66; font-weight:bold; margin-top:0;">✅ Room Berhasil Diaktifkan!</p>
@@ -36,12 +46,17 @@
       
       <p style="margin-bottom:4px; margin-top:12px; font-size:0.8rem; color:#aaa;">Link Controller (Buka di HP Wasit):</p>
       <a id="linkHp" class="link-btn" style="background: #ffcc00;" href="#" target="_blank">Buka Remot Wasit</a>
+
+      <!-- Tombol Kirim / Simpan ke WhatsApp Buyer -->
+      <a id="waBtn" class="btn-wa" href="#" target="_blank">
+        📲 Simpan & Kirim Rekap Link ke WA Saya
+      </a>
     </div>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyB_5DbpY5XqNMXPTBljXK0gm4zyH-wkAiI",
@@ -56,15 +71,27 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // Ganti KODE_RAHASIA ini dengan kata sandi yang Anda berikan di Lynk.id
-    const VALID_LICENSE = "NUKA2026"; 
+    // Otomatis baca REF ID jika dikirim via URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const autoRefId = urlParams.get('ref');
+
+    if (autoRefId) {
+      const licenseInput = document.getElementById('licenseInput');
+      licenseInput.value = autoRefId;
+      licenseInput.readOnly = true;
+      licenseInput.style.backgroundColor = "#1b3320";
+      licenseInput.style.borderColor = "#00ff66";
+    }
 
     window.activateRoom = function() {
       const license = document.getElementById('licenseInput').value.trim();
       const roomRaw = document.getElementById('roomInput').value.trim();
 
-      if (license !== VALID_LICENSE) {
-        return alert('❌ Kode Lisensi Salah! Silakan cek kembali bukti pembelian di Lynk.id.');
+      // Validasi format REF ID bawaan Lynk.id (Minimal 20 karakter hex)
+      const isValidLynkRef = /^[a-f0-9]{20,}$/i.test(license);
+
+      if (!isValidLynkRef) {
+        return alert('❌ REF ID tidak valid! Pastikan Anda memasukkan REF ID resmi dari resi pembayaran Lynk.id.');
       }
 
       if (!roomRaw) {
@@ -73,20 +100,41 @@
 
       const room = roomRaw.toLowerCase().replace(/[^a-z0-9-]/g, '-');
 
-      // Otomatis Daftarkan Room ke Firebase Realtime Database
-      set(ref(db, `allowed_rooms/${room}`), true).then(() => {
-        const urlTv = `https://skordigital.my.id/?room=${room}`;
-        const urlHp = `https://skordigital.my.id/controller.html?room=${room}`;
+      // 1. Cek apakah REF ID ini sudah pernah digunakan untuk room lain
+      const licenseRef = ref(db, `used_licenses/${license}`);
+      
+      get(licenseRef).then((snapshot) => {
+        if (snapshot.exists() && snapshot.val() !== room) {
+          alert(`❌ GAGAL: REF ID transaksi ini sudah digunakan untuk mengaktifkan room "${snapshot.val()}". 1 Pembayaran hanya berlaku untuk 1 Room!`);
+        } else {
+          // 2. Simpan room ke daftar diizinkan & kunci REF ID
+          set(ref(db, `allowed_rooms/${room}`), true);
+          set(ref(db, `used_licenses/${license}`), room);
 
-        document.getElementById('linkTv').href = urlTv;
-        document.getElementById('linkTv').innerText = urlTv;
-        
-        document.getElementById('linkHp').href = urlHp;
-        document.getElementById('linkHp').innerText = urlHp;
+          const urlTv = `https://skordigital.my.id/?room=${room}`;
+          const urlHp = `https://skordigital.my.id/controller.html?room=${room}`;
 
-        document.getElementById('resultBox').style.display = 'block';
+          document.getElementById('linkTv').href = urlTv;
+          document.getElementById('linkTv').innerText = urlTv;
+          
+          document.getElementById('linkHp').href = urlHp;
+          document.getElementById('linkHp').innerText = urlHp;
+
+          // Rangkai teks rekap untuk WhatsApp
+          const waMessage = encodeURIComponent(
+            `🏆 *LINK AKSES PAPAN SKOR DIGITAL*\n\n` +
+            `Nama Room: *${room}*\n` +
+            `REF ID: \`${license}\`\n\n` +
+            `📺 *Link Display TV:* ${urlTv}\n\n` +
+            `📱 *Link Remot Wasit:* ${urlHp}\n\n` +
+            `Simpan pesan ini untuk mengontrol papan skor Anda!`
+          );
+          document.getElementById('waBtn').href = `https://api.whatsapp.com/send?text=${waMessage}`;
+
+          document.getElementById('resultBox').style.display = 'block';
+        }
       }).catch((err) => {
-        alert('Gagal mengaktifkan room: ' + err.message);
+        alert('Terjadi kesalahan jaringan: ' + err.message);
       });
     };
   </script>
