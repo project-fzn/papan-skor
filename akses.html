@@ -11,12 +11,10 @@
     h2 { color: #00e5ff; margin-top: 0; font-size: 1.5rem; }
     p { color: #aaa; font-size: 0.88rem; line-height: 1.4; }
     label { font-size: 0.8rem; color: #888; text-align: left; display: block; margin-top: 10px; font-weight: 600; }
-    .input-wrapper { display: flex; gap: 6px; margin: 6px 0 10px 0; }
-    input { width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #444; background: #2b2b2b; color: white; text-align: center; font-weight: bold; font-size: 0.9rem; }
+    input { width: 100%; padding: 12px; margin: 6px 0 10px 0; border-radius: 6px; border: 1px solid #444; background: #2b2b2b; color: white; text-align: center; font-size: 0.95rem; }
     input:focus { border-color: #00e5ff; outline: none; }
-    .btn-paste { background: #334155; color: #00e5ff; border: 1px solid #00e5ff; border-radius: 6px; padding: 0 12px; font-size: 0.8rem; font-weight: bold; cursor: pointer; white-space: nowrap; }
-    button.btn-submit { width: 100%; padding: 14px; background: #28a745; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 12px; transition: 0.2s; }
-    button.btn-submit:hover { background: #218838; }
+    button { width: 100%; padding: 14px; background: #28a745; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 12px; transition: 0.2s; }
+    button:hover { background: #218838; }
     
     .result { margin-top: 20px; display: none; text-align: left; background: #000; padding: 15px; border-radius: 8px; border: 1px solid #00ff66; }
     .link-btn { display: block; padding: 10px; background: #00e5ff; color: black; text-decoration: none; font-weight: bold; text-align: center; border-radius: 6px; margin-top: 6px; font-size: 0.85rem; word-break: break-all; }
@@ -27,18 +25,15 @@
 
   <div class="card">
     <h2>🎉 Aktivasi Papan Skor</h2>
-    <p>Salin <b>REF ID</b> dari resi email Lynk.id Anda, lalu tempelkan di bawah ini:</p>
+    <p>Masukkan <b>Email Pembelian Lynk.id</b> dan buat <b>Nama Room</b> Anda:</p>
     
-    <label>REF ID Transaksi:</label>
-    <div class="input-wrapper">
-      <input type="text" id="licenseInput" placeholder="Contoh: 8956ce6e..." />
-      <button class="btn-paste" onclick="pasteRef()">📋 Tempel</button>
-    </div>
+    <label>Email Saat Pembelian:</label>
+    <input type="email" id="emailInput" placeholder="contoh: fauuuzaan@gmail.com" />
 
     <label>Nama Room / GOR yang Diinginkan:</label>
     <input type="text" id="roomInput" placeholder="Contoh: gor-jawara" />
     
-    <button class="btn-submit" onclick="activateRoom()">Aktifkan & Buat Link Akses</button>
+    <button onclick="activateRoom()">Aktifkan & Buat Link Akses</button>
 
     <div id="resultBox" class="result">
       <p style="color:#00ff66; font-weight:bold; margin-top:0;">✅ Room Berhasil Diaktifkan!</p>
@@ -72,67 +67,77 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // Fungsi Tempel Otomatis dari Clipboard
-    window.pasteRef = async function() {
-      try {
-        const text = await navigator.clipboard.readText();
-        if (text) {
-          document.getElementById('licenseInput').value = text.trim();
-        }
-      } catch (err) {
-        alert('Gagal membaca clipboard. Silakan paste manual dengan tahan lama di kolom input.');
-      }
-    };
-
-    window.activateRoom = function() {
-      const license = document.getElementById('licenseInput').value.trim();
+    window.activateRoom = async function() {
+      const email = document.getElementById('emailInput').value.trim().toLowerCase();
       const roomRaw = document.getElementById('roomInput').value.trim();
 
-      const isValidLynkRef = /^[a-f0-9]{15,}$/i.test(license);
-
-      if (!isValidLynkRef) {
-        return alert('❌ REF ID tidak valid! Salin REF ID resmi sepanjang 32 karakter dari resi email Lynk.id Anda.');
-      }
-
-      if (!roomRaw) {
-        return alert('⚠️ Silakan isi nama room terlebih dahulu!');
+      if (!email || !roomRaw) {
+        return alert('⚠️ Harap isi Email Pembelian dan Nama Room!');
       }
 
       const room = roomRaw.toLowerCase().replace(/[^a-z0-9-]/g, '-');
 
-      const licenseRef = ref(db, `used_licenses/${license}`);
-      
-      get(licenseRef).then((snapshot) => {
-        if (snapshot.exists() && snapshot.val() !== room) {
-          alert(`❌ GAGAL: REF ID transaksi ini sudah digunakan untuk mengaktifkan room "${snapshot.val()}". 1 Pembayaran hanya berlaku untuk 1 Room!`);
-        } else {
-          set(ref(db, `allowed_rooms/${room}`), true);
-          set(ref(db, `used_licenses/${license}`), room);
+      try {
+        // Cari transaksi di Firebase berdasarkan email
+        const licensesRef = ref(db, 'valid_licenses');
+        const snapshot = await get(licensesRef);
 
-          const urlTv = `https://skordigital.my.id/?room=${room}`;
-          const urlHp = `https://skordigital.my.id/controller.html?room=${room}`;
-
-          document.getElementById('linkTv').href = urlTv;
-          document.getElementById('linkTv').innerText = urlTv;
-          
-          document.getElementById('linkHp').href = urlHp;
-          document.getElementById('linkHp').innerText = urlHp;
-
-          const waMessage = encodeURIComponent(
-            `🏆 *LINK AKSES PAPAN SKOR DIGITAL*\n\n` +
-            `Nama Room: *${room}*\n` +
-            `REF ID: \`${license}\`\n\n` +
-            `📺 *Link Display TV:* ${urlTv}\n\n` +
-            `📱 *Link Remot Wasit:* ${urlHp}\n\n` +
-            `Simpan pesan ini untuk mengontrol papan skor Anda!`
-          );
-          document.getElementById('waBtn').href = `https://api.whatsapp.com/send?text=${waMessage}`;
-
-          document.getElementById('resultBox').style.display = 'block';
+        if (!snapshot.exists()) {
+          return alert('❌ Transaksi tidak ditemukan! Pastikan Anda memasukkan email yang sama saat membeli di Lynk.id.');
         }
-      }).catch((err) => {
-        alert('Terjadi kesalahan jaringan: ' + err.message);
-      });
+
+        let foundRefId = null;
+        let licenseData = null;
+
+        snapshot.forEach((childSnap) => {
+          const val = childSnap.val();
+          if (val.email && val.email.toLowerCase() === email) {
+            foundRefId = childSnap.key;
+            licenseData = val;
+          }
+        });
+
+        if (!foundRefId) {
+          return alert('❌ Email transaksi tidak terdaftar atau pembayaran belum sukses!');
+        }
+
+        // Cek apakah lisensi email ini sudah dipakai untuk mengaktifkan room
+        if (licenseData.status === "USED" && licenseData.room !== room) {
+          return alert(`❌ GAGAL: Email ini sudah digunakan untuk mengaktifkan room "${licenseData.room}". 1 Pembelian hanya berlaku untuk 1 Room!`);
+        }
+
+        // Aktifkan Room & Kunci status lisensi di Firebase
+        await set(ref(db, `allowed_rooms/${room}`), true);
+        await set(ref(db, `valid_licenses/${foundRefId}`), {
+          status: "USED",
+          email: email,
+          room: room
+        });
+
+        const urlTv = `https://skordigital.my.id/?room=${room}`;
+        const urlHp = `https://skordigital.my.id/controller.html?room=${room}`;
+
+        document.getElementById('linkTv').href = urlTv;
+        document.getElementById('linkTv').innerText = urlTv;
+        
+        document.getElementById('linkHp').href = urlHp;
+        document.getElementById('linkHp').innerText = urlHp;
+
+        const waMessage = encodeURIComponent(
+          `🏆 *LINK AKSES PAPAN SKOR DIGITAL*\n\n` +
+          `Nama Room: *${room}*\n` +
+          `Email Pembeli: \`${email}\`\n\n` +
+          `📺 *Link Display TV:* ${urlTv}\n\n` +
+          `📱 *Link Remot Wasit:* ${urlHp}\n\n` +
+          `Simpan pesan ini untuk mengontrol papan skor Anda!`
+        );
+        document.getElementById('waBtn').href = `https://api.whatsapp.com/send?text=${waMessage}`;
+
+        document.getElementById('resultBox').style.display = 'block';
+
+      } catch (err) {
+        alert('Terjadi kesalahan: ' + err.message);
+      }
     };
   </script>
 </body>
